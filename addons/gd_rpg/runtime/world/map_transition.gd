@@ -120,6 +120,29 @@ func _read_save(slot: int) -> Dictionary:
 		return {}
 	return parsed
 
+func _is_valid_save_data(data: Dictionary, slot: int) -> bool:
+	if data.get("slot") != slot:
+		return false
+	if not data.get("saved_at") is int or data.saved_at <= 0:
+		return false
+	var play_time: Variant = data.get("play_time")
+	if not (play_time is int or play_time is float) or not is_finite(float(play_time)) or play_time < 0.0:
+		return false
+	var map_id: Variant = data.get("map")
+	var scene_path: Variant = data.get("scene")
+	if not map_id is String or not scene_path is String:
+		return false
+	if not MAP_SCENES.has(map_id) or MAP_SCENES[map_id] != scene_path:
+		return false
+	var position: Variant = data.get("position")
+	if not position is Array or position.size() != 2:
+		return false
+	for coordinate in position:
+		if not (coordinate is int or coordinate is float) or not is_finite(float(coordinate)):
+			return false
+	var saved_transfer: Variant = data.get("transfer")
+	return saved_transfer is Dictionary and _is_valid_transfer(saved_transfer)
+
 func _save_path(slot: int) -> String:
 	return "%s/slot_%02d.sav" % [SAVE_DIRECTORY, slot]
 
