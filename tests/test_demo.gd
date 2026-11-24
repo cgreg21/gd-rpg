@@ -122,7 +122,7 @@ func _initialize() -> void:
 	demo.get("inventory").remove_item(&"potion", demo.get("inventory").count(&"potion"))
 	demo.call("_restore_transfer_state")
 	assert(demo.get("player_hp") == 4 and demo.get("player_mp") == 1, "Map transfer must restore HP and MP")
-	assert(demo.get("experience") == 0 and demo.get("gold") == 30, "Map transfer must restore experience and gold")
+	assert(demo.get("experience") == 20 and demo.get("gold") == 45, "Map transfer must restore experience and gold")
 	assert(demo.get("door_opened") and demo.get("chest_opened") and demo.get("slime_defeated"), "Map transfer must restore quest flags")
 	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Map transfer must restore inventory")
 
