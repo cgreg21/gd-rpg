@@ -1,21 +1,10 @@
 extends Node2D
-## Pixel-grid test: move the marker with the arrow keys and toggle CRT with F3.
+## Pixel-grid test content, rendered by RPGDisplayRoot at 640x360.
 
 var player_position := Vector2i(320, 180)
-var crt_overlay: RPGCRTOverlay
 
 func _ready() -> void:
 	queue_redraw()
-	var crt_layer := CanvasLayer.new()
-	crt_layer.layer = 10
-	add_child(crt_layer)
-	crt_overlay = RPGCRTOverlay.new()
-	crt_overlay.name = "CRTOverlay"
-	var shader_material := ShaderMaterial.new()
-	shader_material.shader = load("res://addons/gd_rpg/runtime/display/crt.gdshader")
-	crt_overlay.material = shader_material
-	crt_overlay.enabled = OS.get_environment("GD_RPG_SCREENSHOT_CRT") == "1"
-	crt_layer.add_child(crt_overlay)
 	var ui := CanvasLayer.new()
 	add_child(ui)
 	var label := Label.new()
@@ -34,10 +23,6 @@ func _process(_delta: float) -> void:
 		player_position.x = clampi(player_position.x, 8, 632)
 		player_position.y = clampi(player_position.y, 8, 352)
 		queue_redraw()
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-		crt_overlay.enabled = not crt_overlay.enabled
 
 func _draw() -> void:
 	for x in range(0, 640, 32):
