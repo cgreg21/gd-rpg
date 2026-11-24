@@ -587,7 +587,7 @@ func _restore_transfer_state() -> void:
 	status_label.text = _objective_text()
 
 func _save_game(slot: int = 1) -> bool:
-	if battle_active or inventory_open or save_menu_open:
+	if battle_active or inventory_open:
 		_show_message("Sauvegarde indisponible pendant un menu ou un combat.")
 		return false
 	_store_transfer_state()
@@ -596,7 +596,7 @@ func _save_game(slot: int = 1) -> bool:
 	return saved
 
 func _load_game(slot: int = 1) -> bool:
-	if battle_active or inventory_open or (save_menu_open and not overwrite_pending):
+	if battle_active or inventory_open:
 		_show_message("Chargement indisponible pendant un menu ou un combat.")
 		return false
 	if not RPGMapRouter.load_game(map_id, slot):
