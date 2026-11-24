@@ -26,7 +26,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Open the game at 1920×1080 Full HD by default; render the 640×360 game viewport at exact 3× nearest-neighbor scale.
 - [x] Add a GitHub Actions visual capture workflow for demo/pixel-test scenes, clean and CRT, at 1080p.
 - [x] Run the CRT post-process after upscaling, at the native 1920×1080 output resolution.
-- [x] Use a dedicated 640×360 SubViewport and nearest-neighbor SubViewportContainer scaling into a native 1920×1080 root viewport.
+- [x] Use a dedicated fixed 640×360 SubViewport and a full-screen TextureRect with nearest-neighbor scaling into the native 1920×1080 root viewport.
 - [x] Set the default window size to 1920×1080 (Full HD, 16:9).
 - [x] Set nearest-neighbor canvas texture filtering as the project default.
 - [ ] Keep sprite, tile and UI artwork aligned to the pixel grid.
