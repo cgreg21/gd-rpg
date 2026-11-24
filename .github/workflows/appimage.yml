@@ -9,10 +9,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   appimage:
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip appimage]')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +79,22 @@ jobs:
       - name: Smoke test AppImage
         run: ./GD-RPG-x86_64.AppImage --appimage-extract-and-run --headless --quit-after 5
 
-      - name: Upload AppImage
+      - name: Publish AppImage in repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p dist
+          install -m 755 GD-RPG-x86_64.AppImage dist/GD-RPG-x86_64.AppImage
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/GD-RPG-x86_64.AppImage
+          if git diff --cached --quiet; then
+            echo "AppImage already up to date"
+            exit 0
+          fi
+          git commit -m "build: publish Linux AppImage [skip appimage]"
+          git push
+
+      - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
         with:
           name: gd-rpg-linux-appimage
