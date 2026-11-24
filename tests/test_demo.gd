@@ -37,6 +37,9 @@ func _initialize() -> void:
 	assert(demo.get("chest").is_queued_for_deletion(), "Opened chest must be removed")
 	demo._open_chest()
 	assert(demo.get("gold") == 10 and demo.get("inventory").count(&"old_key") == 1, "Chest rewards must only be granted once")
+	demo._toggle_inventory()
+	assert(demo.get("inventory_label").text.contains("Vieille clé"), "Inventory menu must list quest items")
+	demo._toggle_inventory()
 	demo._open_door()
 	assert(demo.get("door_opened"), "Old key must unlock the sanctuary door")
 	assert(demo.get("inventory").count(&"old_key") == 0, "Unlocking must consume the old key")
@@ -45,7 +48,7 @@ func _initialize() -> void:
 	demo._open_door()
 	assert(demo.get("gold") == 30, "Sanctuary reward must only be granted once")
 	demo._toggle_inventory()
-	assert(demo.get("inventory_label").text.contains("Vieille clé"), "Inventory menu must list quest items")
+	assert(not demo.get("inventory_label").text.contains("Vieille clé"), "Consumed quest key must disappear from inventory")
 	demo._toggle_inventory()
 
 	var animation := demo.get("hero_animation") as AnimatedSprite2D
@@ -75,6 +78,6 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
-	print("Demo tests passed: animated hero, quest, treasure, inventory and battle commands.")
+	print("Demo tests passed: animated hero, quest, locked door, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()

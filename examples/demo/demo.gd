@@ -494,7 +494,7 @@ func _draw_battle_overlay(show: bool) -> void:
 func _update_prompt() -> void:
 	var nearest := 999.0
 	var prompt := ""
-	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"]]:
+	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"], [DOOR_POSITION, "E : Déverrouiller"]]:
 		var distance: float = player.global_position.distance_to(candidate[0])
 		if distance < nearest:
 			nearest = distance
@@ -602,9 +602,16 @@ func _draw_chest(parent: Node2D) -> void:
 	parent.add_child(lock)
 
 func _draw_locked_door(parent: Node2D) -> void:
-	_draw_rect(Vector2(-18, -22), Vector2(36, 44), "#65432f", 0)
-	_draw_rect(Vector2(-14, -18), Vector2(28, 40), "#a66c3d", 1)
-	_draw_rect(Vector2(-3, -2), Vector2(6, 10), "#e7c879", 2)
+	for part in [
+		[Vector2(-18, -22), Vector2(36, 44), "#65432f"],
+		[Vector2(-14, -18), Vector2(28, 40), "#a66c3d"],
+		[Vector2(-3, -2), Vector2(6, 10), "#e7c879"]
+	]:
+		var rect := ColorRect.new()
+		rect.position = part[0]
+		rect.size = part[1]
+		rect.color = Color(part[2])
+		parent.add_child(rect)
 	var blocker := StaticBody2D.new()
 	var collision := CollisionShape2D.new()
 	var shape := RectangleShape2D.new()
