@@ -42,6 +42,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add restrained phosphor glow and chromatic aberration controls.
 - [x] Expose shader parameters directly on `RPGCRTOverlay` for inspector/runtime tuning.
 - [x] Provide clean, subtle CRT and stronger retro presets, plus a fully disabled mode.
+- [x] Add a permanent CRT housing with beveled frame, inset curved glass and real-time reflections sampled from the game framebuffer; keep the housing visible in clean mode.
 - [~] Verify pixel readability, shader performance and visual quality across physical displays and integrated GPUs.
 
 **Visual acceptance:** the 640×360 source renders at exact 3× scale on a 1920×1080 display; pixels remain crisp and stable during movement. The CRT effect can be toggled without changing gameplay or breaking UI readability. The clean mode must look correct without any CRT shader.
