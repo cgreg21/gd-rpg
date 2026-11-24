@@ -31,9 +31,10 @@ func _run() -> void:
 	map.set_entry_spawn(&"missing")
 	assert(map.get_spawn_position() == Vector2(32, 48), "Unknown entry spawn must fall back to default")
 
-	RPGMapRouter.pending_spawn_id = &"east"
-	assert(RPGMapRouter.take_spawn_id() == &"east", "Router must provide the pending spawn once")
-	assert(RPGMapRouter.take_spawn_id().is_empty(), "Router must clear a consumed spawn")
+	var router := root.get_node("RPGMapRouter")
+	router.pending_spawn_id = &"east"
+	assert(router.take_spawn_id() == &"east", "Router must provide the pending spawn once")
+	assert(router.take_spawn_id().is_empty(), "Router must clear a consumed spawn")
 
 	var anchor := Node2D.new()
 	anchor.position = Vector2(10.4, 8.7)
