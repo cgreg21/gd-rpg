@@ -38,7 +38,8 @@ func _initialize() -> void:
 	demo._end_battle(true)
 	assert(demo.get("experience") == 20 and demo.get("gold") == 15, "Victory rewards must only be granted once")
 	demo._talk_to_npc()
-	assert(demo.get("dialogue_runner").current_dialogue.dialogue_id == &"lila", "NPC must keep using the dialogue runner")
+	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
+	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
 	print("Demo tests passed: animated hero, quest, battle commands, skills, items and defense.")
 	demo.queue_free()
