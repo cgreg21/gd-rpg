@@ -69,7 +69,7 @@ Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime
 - Use `RPGPixelCamera` as a `Camera2D` child of the player. It offsets the camera view to whole virtual pixels without mutating the camera's world transform, avoiding subpixel camera movement.
 - The demo is itself an `RPGMap`, uses a named default spawn, and demonstrates the pixel camera.
 
-The map base and camera are foundations: TileMapLayer composition, camera limits and map transitions are still planned.
+`RPGMapRouter` is an autoload that replaces the map inside `RPGDisplayRoot` (so the 640×360 viewport and CRT presentation stay active), fades to black, and passes a named entry spawn to the next `RPGMap`. Call `RPGMapRouter.transition_to("res://path/to/map.tscn", &"entry")`; add named `Marker2D` children under `SpawnPoints`. Missing spawn names fall back to the map default. Party/world-state transfer and camera limits remain planned.
 
 ## Layout
 - `addons/gd_rpg/runtime`: reusable runtime systems, including display, character, dialogue, interaction and world foundations

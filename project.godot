@@ -19,5 +19,8 @@ renderer/rendering_method="gl_compatibility"
 textures/default_filters/use_nearest_mipmap_filter=false
 textures/canvas_textures/default_texture_filter=0
 
+[autoload]
+RPGMapRouter="*res://addons/gd_rpg/runtime/world/map_transition.gd"
+
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gd_rpg/plugin.cfg")

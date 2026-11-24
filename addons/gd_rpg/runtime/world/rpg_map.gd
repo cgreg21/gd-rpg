@@ -6,11 +6,16 @@ extends Node2D
 @export var map_id: StringName
 @export var default_spawn: StringName = &"default"
 
+var entry_spawn: StringName
+
+func set_entry_spawn(spawn_id: StringName) -> void:
+	entry_spawn = spawn_id
+
 func has_spawn_point(spawn_id: StringName) -> bool:
 	return _get_spawn_marker(spawn_id) != null
 
 func get_spawn_position(spawn_id: StringName = &"") -> Vector2:
-	var requested_spawn := spawn_id if not spawn_id.is_empty() else default_spawn
+	var requested_spawn := spawn_id if not spawn_id.is_empty() else (entry_spawn if not entry_spawn.is_empty() else default_spawn)
 	var marker := _get_spawn_marker(requested_spawn)
 	if marker == null and requested_spawn != default_spawn:
 		marker = _get_spawn_marker(default_spawn)

@@ -43,6 +43,7 @@ var message_time := 0.0
 
 func _ready() -> void:
 	map_id = &"valbrume"
+	set_entry_spawn(RPGMapRouter.take_spawn_id())
 	_build_world()
 	_build_player()
 	_build_characters()
