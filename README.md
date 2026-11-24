@@ -32,7 +32,18 @@ The PNG files are committed under [docs/screenshots](docs/screenshots/) so they 
 
 The final display pass is a borderless full-screen CRT effect. F3 toggles curvature, scanlines, RGB grille, vignette, chromatic aberration and restrained glow; disabling it restores the clean pixel-perfect image without any frame or decorative border.
 
-## Playable demo — Valbrume\n\nThe demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.\n\n- **Move:** arrow keys\n- **Interact / collect / attack:** E\n- **Advance dialogue:** Enter\n- **Toggle CRT:** F3\n\nTalk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path.\n\n## World and camera foundations
+## Playable demo — Valbrume
+
+The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
+
+- **Move:** arrow keys
+- **Interact / collect / attack:** E
+- **Advance dialogue:** Enter
+- **Toggle CRT:** F3
+
+Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path.
+
+## World and camera foundations
 
 - Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).
 - Use `get_spawn_position(&"spawn_name")` to resolve a named entry point; unknown names fall back to the map's `default_spawn`.
