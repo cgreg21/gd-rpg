@@ -13,13 +13,12 @@ void fragment() {
 
 	if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
 		COLOR = vec4(0.0, 0.0, 0.0, strength);
-		return;
+	} else {
+		float scanline = 1.0 - scanline_strength * (0.5 + 0.5 * sin(UV.y * 180.0 * 3.14159265));
+		float grille = 1.0 - grille_strength * (0.5 + 0.5 * cos(UV.x * 320.0 * 3.14159265));
+		float vignette = 1.0 - vignette_strength * dot(centered, centered) * 0.5;
+		float shade = clamp(scanline * grille * vignette, 0.0, 1.0);
+		float alpha = strength * (1.0 - shade);
+		COLOR = vec4(0.0, 0.0, 0.0, alpha);
 	}
-
-	float scanline = 1.0 - scanline_strength * (0.5 + 0.5 * sin(UV.y * 180.0 * 3.14159265));
-	float grille = 1.0 - grille_strength * (0.5 + 0.5 * cos(UV.x * 320.0 * 3.14159265));
-	float vignette = 1.0 - vignette_strength * dot(centered, centered) * 0.5;
-	float shade = clamp(scanline * grille * vignette, 0.0, 1.0);
-	float alpha = strength * (1.0 - shade);
-	COLOR = vec4(0.0, 0.0, 0.0, alpha);
 }
