@@ -16,27 +16,25 @@ func _initialize() -> void:
 	var display := display_scene.instantiate() as RPGDisplayRoot
 	assert(display != null, "Display scene must instantiate RPGDisplayRoot")
 	assert(display.content_scene != null, "Display root must have a content scene")
-	assert(RPGDisplayRoot.INTERNAL_SIZE == Vector2i(640,  360), "Internal game viewport must stay at 640x360")
+	assert(RPGDisplayRoot.INTERNAL_SIZE == Vector2i(640, 360), "Internal game viewport must stay at 640x360")
 
 	root.add_child(display)
 	await process_frame
 	assert(display.internal_viewport != null, "Display root must create its internal viewport")
 	assert(display.internal_viewport.size == Vector2i(640, 360), "Internal viewport must not be resized to the window")
-	## The TextureRect scales the fixed SubViewport without resizing its render target.
 	var game_texture := display.get_node("GameTexture") as TextureRect
 	assert(game_texture != null, "Internal viewport texture must be displayed by a TextureRect")
 	assert(game_texture.texture == display.internal_viewport.get_texture(), "TextureRect must display the internal viewport")
 	assert(game_texture.stretch_mode == TextureRect.STRETCH_SCALE, "Game texture must scale to the output viewport")
 	assert(game_texture.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Game texture must use nearest filtering")
-	assert(display.crt_overlay != null, "Display must create the CRT housing overlay")
-	assert(display.crt_overlay.visible, "CRT housing must remain visible when CRT phosphor effects are disabled")
+	assert(display.crt_overlay != null, "Display must create the CRT post-process")
+	assert(display.crt_overlay.visible, "CRT post-process must cover the output viewport")
 	var crt_material := display.crt_overlay.material as ShaderMaterial
-	assert(crt_material != null, "CRT housing must use its screen-space shader")
-	assert(float(crt_material.get_shader_parameter("crt_enabled")) == 0.0, "Clean mode must disable phosphor effects without hiding the housing")
-	assert(crt_material.shader.code.contains("reflected_game"), "CRT shader must derive reflections from the live game framebuffer")
+	assert(crt_material != null, "CRT post-process must use its screen-space shader")
+	assert(float(crt_material.get_shader_parameter("crt_enabled")) == 0.0, "Clean mode must disable CRT effects")
+	assert(not crt_material.shader.code.contains("SCREEN_INSET"), "CRT pass must not reserve space for a housing frame")
 	assert(crt_material.shader.code.contains("floor(screen_uv.y * 360.0)"), "CRT scanlines must align with internal 360p source rows")
 	assert(crt_material.shader.code.contains("mod(source_row, 2.0)"), "CRT scanlines must alternate source pixel rows")
-	assert(crt_material.shader.code.count("uniform float corner_roundness") == 1, "CRT corner uniform must be declared only once")
 
 	print("Display tests passed: fixed 640x360 render scaled to 1920x1080.")
 	quit()
