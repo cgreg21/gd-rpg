@@ -203,29 +203,71 @@ func _build_characters() -> void:
 	add_child(npc)
 	_add_name_tag(npc, "Lila")
 
-	crystal = Node2D.new()
-	crystal.position = CRYSTAL_POSITION
+	crystal = _create_crystal()
 	add_child(crystal)
-	_draw_diamond(crystal, Color("#7de7f2"))
-	_add_name_tag(crystal, "Cristal")
-
-	slime = Node2D.new()
-	slime.position = SLIME_POSITION
+	slime = _create_slime()
 	add_child(slime)
-	_draw_slime(slime)
-	_add_name_tag(slime, "Slime")
-
-	chest = Node2D.new()
-	chest.position = CHEST_POSITION
+	chest = _create_chest()
 	add_child(chest)
-	_draw_chest(chest)
-	_add_name_tag(chest, "Coffre")
-
-	door = Node2D.new()
-	door.position = DOOR_POSITION
+	door = _create_door()
 	add_child(door)
-	_draw_locked_door(door)
-	_add_name_tag(door, "Sanctuaire")
+
+func _create_crystal() -> Node2D:
+	var node := Node2D.new()
+	node.position = CRYSTAL_POSITION
+	_draw_diamond(node, Color("#7de7f2"))
+	_add_name_tag(node, "Cristal")
+	return node
+
+func _create_slime() -> Node2D:
+	var node := Node2D.new()
+	node.position = SLIME_POSITION
+	_draw_slime(node)
+	_add_name_tag(node, "Slime")
+	return node
+
+func _create_chest() -> Node2D:
+	var node := Node2D.new()
+	node.position = CHEST_POSITION
+	_draw_chest(node)
+	_add_name_tag(node, "Coffre")
+	return node
+
+func _create_door() -> Node2D:
+	var node := Node2D.new()
+	node.position = DOOR_POSITION
+	_draw_locked_door(node)
+	_add_name_tag(node, "Sanctuaire")
+	return node
+
+func _restore_world_objects() -> void:
+	if has_crystal:
+		if is_instance_valid(crystal):
+			crystal.queue_free()
+	elif not is_instance_valid(crystal) or crystal.is_queued_for_deletion():
+		crystal = _create_crystal()
+		add_child(crystal)
+
+	if chest_opened:
+		if is_instance_valid(chest):
+			chest.queue_free()
+	elif not is_instance_valid(chest) or chest.is_queued_for_deletion():
+		chest = _create_chest()
+		add_child(chest)
+
+	if door_opened:
+		if is_instance_valid(door):
+			door.queue_free()
+	elif not is_instance_valid(door) or door.is_queued_for_deletion():
+		door = _create_door()
+		add_child(door)
+
+	if slime_defeated:
+		if is_instance_valid(slime):
+			slime.queue_free()
+	elif not is_instance_valid(slime) or slime.is_queued_for_deletion():
+		slime = _create_slime()
+		add_child(slime)
 
 func _build_inventory() -> void:
 	inventory = RPGInventory.new()
@@ -426,14 +468,7 @@ func _load_game() -> bool:
 		inventory.remove_item(item_id, inventory.count(item_id))
 	for item_id in saved_items:
 		inventory.add_item(StringName(item_id), saved_items[item_id])
-	if has_crystal and is_instance_valid(crystal):
-		crystal.queue_free()
-	if chest_opened and is_instance_valid(chest):
-		chest.queue_free()
-	if door_opened and is_instance_valid(door):
-		door.queue_free()
-	if slime_defeated and is_instance_valid(slime):
-		slime.queue_free()
+	_restore_world_objects()
 	slime_hp = 0 if slime_defeated else 3
 	player.set_input_enabled(true)
 	_update_battle_hud()
