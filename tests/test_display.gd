@@ -22,6 +22,7 @@ func _initialize() -> void:
 	await process_frame
 	assert(display.internal_viewport != null, "Display root must create its internal viewport")
 	assert(display.internal_viewport.size == Vector2i(640, 360), "Internal viewport must not be resized to the window")
+	## The TextureRect scales the fixed SubViewport without resizing its render target.
 	var game_texture := display.get_node("GameTexture") as TextureRect
 	assert(game_texture != null, "Internal viewport texture must be displayed by a TextureRect")
 	assert(game_texture.texture == display.internal_viewport.get_texture(), "TextureRect must display the internal viewport")
