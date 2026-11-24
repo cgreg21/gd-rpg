@@ -34,8 +34,8 @@ func _initialize() -> void:
 	assert(crt_material != null, "CRT housing must use its screen-space shader")
 	assert(float(crt_material.get_shader_parameter("crt_enabled")) == 0.0, "Clean mode must disable phosphor effects without hiding the housing")
 	assert(crt_material.shader.code.contains("reflected_game"), "CRT shader must derive reflections from the live game framebuffer")
-	assert(crt_material.shader.code.contains("FRAGCOORD.y"), "CRT scanlines must use native output pixels")
-	assert(crt_material.shader.code.contains("mod(FRAGCOORD.y, 3.0)"), "CRT scanlines must follow the three-pixel output cadence")
+	assert(crt_material.shader.code.contains("floor(screen_uv.y * 360.0)"), "CRT scanlines must align with internal 360p source rows")
+	assert(crt_material.shader.code.contains("mod(source_row, 2.0)"), "CRT scanlines must alternate source pixel rows")
 	assert(crt_material.shader.code.count("uniform float corner_roundness") == 1, "CRT corner uniform must be declared only once")
 
 	print("Display tests passed: fixed 640x360 render scaled to 1920x1080.")
