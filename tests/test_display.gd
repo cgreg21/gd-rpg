@@ -28,6 +28,12 @@ func _initialize() -> void:
 	assert(game_texture.texture == display.internal_viewport.get_texture(), "TextureRect must display the internal viewport")
 	assert(game_texture.stretch_mode == TextureRect.STRETCH_SCALE, "Game texture must scale to the output viewport")
 	assert(game_texture.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Game texture must use nearest filtering")
+	assert(display.crt_overlay != null, "Display must create the CRT housing overlay")
+	assert(display.crt_overlay.visible, "CRT housing must remain visible when CRT phosphor effects are disabled")
+	var crt_material := display.crt_overlay.material as ShaderMaterial
+	assert(crt_material != null, "CRT housing must use its screen-space shader")
+	assert(float(crt_material.get_shader_parameter("crt_enabled")) == 0.0, "Clean mode must disable phosphor effects without hiding the housing")
+	assert(crt_material.shader.code.contains("reflected_game"), "CRT shader must derive reflections from the live game framebuffer")
 
 	print("Display tests passed: fixed 640x360 render scaled to 1920x1080.")
 	quit()
