@@ -3,12 +3,14 @@ name: Visual screenshots
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/screenshots/**"
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   screenshots:
@@ -51,6 +53,19 @@ jobs:
             difference="$(compare -metric AE "artifacts/screenshots/$scene.png" "artifacts/screenshots/${scene}_crt.png" null: 2>&1 || true)"
             awk -v value="$difference" 'BEGIN { if ((value + 0) > 0) exit 0; exit 1; }' || { echo "CRT screenshot is identical to clean screenshot for $scene"; exit 1; }
           done
+
+      - name: Publish screenshots to repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p docs/screenshots
+          cp artifacts/screenshots/*.png docs/screenshots/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: update generated screenshots"
+            git push
+          fi
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
