@@ -121,11 +121,11 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ### P2.3 — Save and load
 
-**Progress:** F5/F9 now save and load the active map (village, forest route or unlocked sanctuary), exact player position and shared party/inventory/quest snapshot through a versioned binary `.sav` file using Godot Variant serialization. The file includes a signature and format version; unsupported map paths and malformed data are rejected. Three independent slots now store map, timestamp and accumulated play time metadata; an in-game slot browser remains planned.
+**Progress:** F5/F9 now save and load the active map (village, forest route or unlocked sanctuary), exact player position and shared party/inventory/quest snapshot through a versioned binary `.sav` file using Godot Variant serialization. The file includes a signature and format version; unsupported map paths and malformed data are rejected. Three independent slots now store map, timestamp and accumulated play time metadata; an in-game three-slot browser now displays map, timestamp and play time, supports loading and confirms overwrites.
 - [x] Define a versioned binary save-data format for the connected demo maps.
 - [x] Save the active map, player position, HP/MP, EXP, gold, inventory and quest flags across the connected demo maps.
 - [x] Add three binary save slots with map, timestamp and play-time metadata.
-- [ ] Add an in-game save-slot browser and formatted metadata display.
+- [x] Add an in-game save-slot browser with three slots, map/date/play-time metadata and overwrite confirmation.
 - [ ] Handle missing or outdated resource references safely.
 - [x] Add headless save/load coverage, including restoring world objects from an earlier save, and F5/F9 controls on all demo maps.
 
