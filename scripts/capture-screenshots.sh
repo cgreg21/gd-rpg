@@ -10,25 +10,21 @@ capture_scene() {
   local name="$2"
   local pid
 
-  if [[ -n "$scene" ]]; then\n    "$GODOT" --path . --resolution 1920x1080 --windowed "$scene" &\n  else\n    "$GODOT" --path . --resolution 1920x1080 --windowed &\n  fi
+  if [[ -n "$scene" ]]; then
+    "$GODOT" --path . --resolution 1920x1080 --windowed "$scene" &
+  else
+    "$GODOT" --path . --resolution 1920x1080 --windowed &
+  fi
   pid=$!
-  cleanup() {
-    kill "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  }
-  trap cleanup RETURN
 
-  # Give the renderer and scene scripts time to finish their first frames.
   sleep 4
   import -window root "$OUTPUT_DIR/$name.png"
-
-  # The demo and pixel test both bind F3 to the CRT toggle.
   xdotool key --clearmodifiers F3
   sleep 1
   import -window root "$OUTPUT_DIR/${name}_crt.png"
 
-  cleanup
-  trap - RETURN
+  kill "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
 }
 
 capture_scene "" "demo"
