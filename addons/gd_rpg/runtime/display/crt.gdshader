@@ -26,8 +26,10 @@ void fragment() {
 	vec2 centered = SCREEN_UV * 2.0 - 1.0;
 	float radius = dot(centered, centered);
 
-	float edge_distance = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
-	float rounded_corner = smoothstep(0.0, 0.035 * corner_roundness + 0.0001, edge_distance);
+	float corner_radius = 0.12 * corner_roundness;
+	vec2 corner_offset = abs(centered) - vec2(1.0 - corner_radius);
+	float corner_distance = length(max(corner_offset, vec2(0.0))) + min(max(corner_offset.x, corner_offset.y), 0.0) - corner_radius;
+	float rounded_corner = 1.0 - smoothstep(0.0, 0.015, corner_distance);
 	float inside = step(0.0, uv.x) * step(uv.x, 1.0) * step(0.0, uv.y) * step(uv.y, 1.0);
 
 	vec2 aberration = centered * radius * chromatic_aberration;
