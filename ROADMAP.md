@@ -81,8 +81,8 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add an `RPGMap` base with named `Marker2D` spawn points and default-spawn fallback.
 - [x] Add a named default spawn marker to the demo map.
 - [x] Create the Valbrume demo slice with an original four-direction pixel-art hero, village scenery, NPC quest, collectible crystal and turn-based slime encounter.
-- [~] Add map-to-map transitions with fade in/out (village and forest route are connected with two-way portals and named spawns; third map is the sanctuary interior; party and quest state now persist across transitions).
-- [x] Preserve HP/MP, EXP, gold, inventory and Valbrume quest flags when changing maps.
+- [~] Add map-to-map transitions with fade in/out (village and forest route are connected with two-way portals and named spawns; third map is now the sanctuary interior; state transfer remains).
+- [ ] Preserve party and world state when changing maps.
 - [ ] Add camera follow, limits and optional room framing.
 - [ ] Add collision layers/masks conventions and example collision tiles.
 - [~] Add a small connected sample area (village, forest route and sanctuary interior are playable).

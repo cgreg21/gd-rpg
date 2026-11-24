@@ -78,22 +78,6 @@ func _initialize() -> void:
 	await process_frame
 	demo._open_door()
 	assert(demo.get("gold") == 30, "Sanctuary reward must only be granted once")
-	# Transfers retain the party and quest state when the village is recreated.
-	demo.call("_store_transfer_state")
-	demo.set("player_hp", 2)
-	demo.set("player_mp", 0)
-	demo.set("experience", 0)
-	demo.set("gold", 0)
-	demo.set("has_crystal", false)
-	demo.set("chest_opened", false)
-	demo.set("door_opened", false)
-	demo.set("slime_defeated", false)
-	demo.get("inventory").remove_item(&"potion", demo.get("inventory").count(&"potion"))
-	demo.call("_restore_transfer_state")
-	assert(demo.get("player_hp") == 4 and demo.get("player_mp") == 1, "Map transfer must restore HP and MP")
-	assert(demo.get("experience") == 0 and demo.get("gold") == 30, "Map transfer must restore experience and gold")
-	assert(demo.get("door_opened") and demo.get("chest_opened") and demo.get("slime_defeated"), "Map transfer must restore quest flags")
-	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Map transfer must restore inventory")
 	demo._toggle_inventory()
 	assert(not demo.get("inventory_label").text.contains("Vieille clé"), "Consumed quest key must disappear from inventory")
 	demo._toggle_inventory()
@@ -125,6 +109,22 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
+	# Transfers retain the party and quest state when the village is recreated.
+	demo.call("_store_transfer_state")
+	demo.set("player_hp", 2)
+	demo.set("player_mp", 0)
+	demo.set("experience", 0)
+	demo.set("gold", 0)
+	demo.set("has_crystal", false)
+	demo.set("chest_opened", false)
+	demo.set("door_opened", false)
+	demo.set("slime_defeated", false)
+	demo.get("inventory").remove_item(&"potion", demo.get("inventory").count(&"potion"))
+	demo.call("_restore_transfer_state")
+	assert(demo.get("player_hp") == 4 and demo.get("player_mp") == 1, "Map transfer must restore HP and MP")
+	assert(demo.get("experience") == 0 and demo.get("gold") == 30, "Map transfer must restore experience and gold")
+	assert(demo.get("door_opened") and demo.get("chest_opened") and demo.get("slime_defeated"), "Map transfer must restore quest flags")
+	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Map transfer must restore inventory")
 
 	# Save and restore the complete Valbrume quest state.
 	var saved_position: Vector2 = demo.get("player").position

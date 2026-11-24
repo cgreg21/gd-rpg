@@ -52,7 +52,6 @@ func _ready() -> void:
 	_build_characters()
 	_build_inventory()
 	_build_hud()
-	_restore_transfer_state()
 	_show_message("Valbrume — Parle à Lila, récupère le cristal et chasse le slime !")
 
 func _process(delta: float) -> void:
@@ -123,11 +122,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif distance_door < 40.0 and not door_opened:
 		_open_door()
 	elif distance_sanctuary < 38.0 and door_opened:
-		_store_transfer_state()
 		player.set_input_enabled(false)
 		RPGMapRouter.transition_to("res://examples/demo/sanctuary.tscn", &"village_entry")
 	elif distance_portal < 38.0:
-		_store_transfer_state()
 		player.set_input_enabled(false)
 		RPGMapRouter.transition_to("res://examples/demo/route.tscn", &"village_gate")
 	else:
@@ -425,45 +422,6 @@ func _update_inventory_menu() -> void:
 	lines.append("I / Échap : fermer")
 	inventory_label.text = "\\n".join(lines)
 
-
-func _store_transfer_state() -> void:
-	var items: Dictionary = {}
-	for item_id in inventory.item_ids():
-		items[String(item_id)] = inventory.count(item_id)
-	RPGMapRouter.set_transfer_data({
-		"hp": player_hp,
-		"mp": player_mp,
-		"experience": experience,
-		"gold": gold,
-		"inventory": items,
-		"has_crystal": has_crystal,
-		"chest_opened": chest_opened,
-		"door_opened": door_opened,
-		"slime_defeated": slime_defeated
-	})
-
-func _restore_transfer_state() -> void:
-	var data := RPGMapRouter.get_transfer_data()
-	if data.is_empty():
-		return
-	player_hp = int(data.get("hp", player_hp))
-	player_mp = int(data.get("mp", player_mp))
-	experience = int(data.get("experience", experience))
-	gold = int(data.get("gold", gold))
-	has_crystal = bool(data.get("has_crystal", has_crystal))
-	chest_opened = bool(data.get("chest_opened", chest_opened))
-	door_opened = bool(data.get("door_opened", door_opened))
-	slime_defeated = bool(data.get("slime_defeated", slime_defeated))
-	var saved_items: Dictionary = data.get("inventory", {})
-	for item_id in inventory.item_ids():
-		inventory.remove_item(item_id, inventory.count(item_id))
-	for item_id in saved_items:
-		inventory.add_item(StringName(item_id), int(saved_items[item_id]))
-	slime_hp = 0 if slime_defeated else 3
-	_restore_world_objects()
-	_update_battle_hud()
-	_update_inventory_menu()
-	status_label.text = _objective_text()
 
 func _save_game() -> bool:
 	if battle_active or inventory_open:
