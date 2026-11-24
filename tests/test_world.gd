@@ -41,6 +41,14 @@ func _run() -> void:
 	transfer.gold = 0
 	assert(router.get_transfer_data().gold == 25, "Transfer data must be returned as a copy")
 	router.set_transfer_data({})
+	assert(router.save_game(&"valbrume_route", "res://examples/demo/route.tscn", Vector2(123, 234)), "Router must save any supported map position")
+	var save_file := FileAccess.open("user://valbrume_save.json", FileAccess.READ)
+	assert(save_file != null, "Map save must create the save file")
+	var save_data: Variant = JSON.parse_string(save_file.get_as_text())
+	save_file.close()
+	assert(save_data.map == "valbrume_route" and save_data.position == [123.0, 234.0], "Map save must record the active map and exact position")
+	assert(not router.save_game(&"unknown_map", "res://missing.tscn", Vector2.ZERO), "Router must reject unknown map paths")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
 
 	var anchor := Node2D.new()
 	anchor.position = Vector2(10.4, 8.7)

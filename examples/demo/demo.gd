@@ -53,6 +53,9 @@ func _ready() -> void:
 	_build_inventory()
 	_build_hud()
 	_restore_transfer_state()
+	var saved_position := RPGMapRouter.take_loaded_position(map_id)
+	if saved_position != Vector2.INF:
+		player.position = saved_position
 	_show_message("Valbrume — Parle à Lila, récupère le cristal et chasse le slime !")
 
 func _process(delta: float) -> void:
@@ -469,98 +472,23 @@ func _save_game() -> bool:
 	if battle_active or inventory_open:
 		_show_message("Sauvegarde indisponible pendant un menu ou un combat.")
 		return false
-	var items: Dictionary = {}
-	for item_id in inventory.item_ids():
-		items[String(item_id)] = inventory.count(item_id)
-	var data := {
-		"version": SAVE_VERSION,
-		"map": String(map_id),
-		"player_position": [player.position.x, player.position.y],
-		"hp": player_hp,
-		"mp": player_mp,
-		"experience": experience,
-		"gold": gold,
-		"inventory": items,
-		"has_crystal": has_crystal,
-		"chest_opened": chest_opened,
-		"door_opened": door_opened,
-		"slime_defeated": slime_defeated
-	}
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	if file == null:
-		_show_message("Impossible d'écrire la sauvegarde.")
-		return false
-	file.store_string(JSON.stringify(data))
-	file.close()
-	_show_message("Partie sauvegardée. (F9 pour charger)")
-	return true
+	_store_transfer_state()
+	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/demo.tscn", player.position)
+	_show_message("Partie sauvegardée." if saved else "Impossible d'écrire la sauvegarde.")
+	return saved
 
 func _load_game() -> bool:
 	if battle_active or inventory_open:
 		_show_message("Chargement indisponible pendant un menu ou un combat.")
 		return false
-	if not FileAccess.file_exists(SAVE_PATH):
-		_show_message("Aucune sauvegarde trouvée.")
+	if not RPGMapRouter.load_game(map_id):
+		_show_message("Sauvegarde absente ou invalide.")
 		return false
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if file == null:
-		_show_message("Impossible de lire la sauvegarde.")
-		return false
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	file.close()
-	if not parsed is Dictionary or parsed.get("version") != SAVE_VERSION or parsed.get("map") != String(map_id):
-		_show_message("Sauvegarde invalide ou incompatible.")
-		return false
-	var data: Dictionary = parsed
-	var position: Variant = data.get("player_position")
-	var saved_items: Variant = data.get("inventory")
-	if not position is Array or position.size() != 2 or not saved_items is Dictionary:
-		_show_message("Sauvegarde invalide.")
-		return false
-	for value in position:
-		if not (value is int or value is float):
-			_show_message("Sauvegarde invalide.")
-			return false
-	for key in ["hp", "mp", "experience", "gold"]:
-		var value: Variant = data.get(key)
-		if not (value is int or value is float) or int(value) != value:
-			_show_message("Sauvegarde invalide.")
-			return false
-	for flag in ["has_crystal", "chest_opened", "door_opened", "slime_defeated"]:
-		if not data.get(flag) is bool:
-			_show_message("Sauvegarde invalide.")
-			return false
-	for item_id in saved_items:
-		var amount: Variant = saved_items[item_id]
-		if not item_id in ["potion", "old_key"] or not (amount is int or amount is float) or int(amount) != amount or amount < 0:
-			_show_message("Sauvegarde invalide.")
-			return false
-	if data.hp < 1 or data.hp > 5 or data.mp < 0 or data.mp > 3 or data.experience < 0 or data.gold < 0:
-		_show_message("Sauvegarde invalide.")
-		return false
-	if saved_items.get("potion", 0) > 9 or saved_items.get("old_key", 0) > 1:
-		_show_message("Sauvegarde invalide.")
-		return false
-
-	player.position = Vector2(float(position[0]), float(position[1]))
-	player_hp = int(data.hp)
-	player_mp = int(data.mp)
-	experience = int(data.experience)
-	gold = int(data.gold)
-	has_crystal = data.has_crystal
-	chest_opened = data.chest_opened
-	door_opened = data.door_opened
-	slime_defeated = data.slime_defeated
-	for item_id in inventory.item_ids():
-		inventory.remove_item(item_id, inventory.count(item_id))
-	for item_id in saved_items:
-		inventory.add_item(StringName(item_id), int(saved_items[item_id]))
-	_restore_world_objects()
-	slime_hp = 0 if slime_defeated else 3
+	var saved_position := RPGMapRouter.take_loaded_position(map_id)
+	if saved_position != Vector2.INF:
+		player.position = saved_position
+	_restore_transfer_state()
 	player.set_input_enabled(true)
-	_update_battle_hud()
-	_update_inventory_menu()
-	status_label.text = _objective_text()
 	_show_message("Partie chargée.")
 	return true
 

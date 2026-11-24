@@ -14,13 +14,38 @@ func _ready() -> void:
 	_build_world()
 	_build_player()
 	_build_ui()
+	var saved_position := RPGMapRouter.take_loaded_position(map_id)
+	if saved_position != Vector2.INF:
+		player.position = saved_position
 
 func _unhandled_input(event: InputEvent) -> void:
-	if player == null or not event.is_action_pressed("interact"):
+	if player == null:
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F5:
+			_store_map_save()
+			return
+		if event.keycode == KEY_F9:
+			_load_map_save()
+			return
+	if not event.is_action_pressed("interact"):
 		return
 	if player.global_position.distance_to(PORTAL_POSITION) < 42.0:
 		player.set_input_enabled(false)
 		RPGMapRouter.transition_to("res://examples/demo/demo.tscn", &"village_return")
+
+func _store_map_save() -> void:
+	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/route.tscn", player.position)
+	prompt.text = "Partie sauvegardée" if saved else "Échec de la sauvegarde"
+
+func _load_map_save() -> void:
+	if not RPGMapRouter.load_game(map_id):
+		prompt.text = "Sauvegarde absente ou invalide"
+		return
+	var saved_position := RPGMapRouter.take_loaded_position(map_id)
+	if saved_position != Vector2.INF:
+		player.position = saved_position
+	prompt.text = "Partie chargée"
 
 func _process(_delta: float) -> void:
 	if player == null:

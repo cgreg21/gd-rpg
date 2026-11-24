@@ -121,12 +121,12 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ### P2.3 — Save and load
 
-**Progress:** Valbrume can save and restore its player position, HP/MP, EXP, gold, inventory and quest flags through a versioned JSON file in `user://`. F5 saves and F9 loads during exploration; malformed, incompatible and out-of-range data is rejected. Multiple slots, metadata and reusable party/world-state persistence remain planned.
-- [x] Define a versioned JSON save-data format for the Valbrume demo.
-- [~] Save the Valbrume player position, stats, inventory and quest flags; party, switches, variables and map transitions remain planned.
+**Progress:** F5/F9 now save and load the active map (village, forest route or unlocked sanctuary), exact player position and shared party/inventory/quest snapshot through a versioned JSON file. Unsupported map paths and malformed data are rejected. Multiple slots and metadata remain planned.
+- [x] Define a versioned JSON save-data format for the connected demo maps.
+- [x] Save the active map, player position, HP/MP, EXP, gold, inventory and quest flags across the connected demo maps.
 - [ ] Add multiple save slots and basic save metadata.
 - [ ] Handle missing or outdated resource references safely.
-- [x] Add headless save/load coverage, including restoring world objects from an earlier save, and F5/F9 exploration controls.
+- [x] Add headless save/load coverage, including restoring world objects from an earlier save, and F5/F9 controls on all demo maps.
 
 **Acceptance:** a player can save during exploration, restart the game, load, and continue with the same party, inventory and quest state.
 

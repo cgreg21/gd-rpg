@@ -2,9 +2,17 @@ extends CanvasLayer
 ## Replaces the active RPGMap inside RPGDisplayRoot with a short fade.
 
 const FADE_DURATION := 0.25
+const SAVE_PATH := "user://valbrume_save.json"
+const SAVE_VERSION := 2
+const MAP_SCENES := {
+	"valbrume": "res://examples/demo/demo.tscn",
+	"valbrume_route": "res://examples/demo/route.tscn",
+	"valbrume_sanctuary": "res://examples/demo/sanctuary.tscn"
+}
 
 var pending_spawn_id: StringName
 var transfer_data: Dictionary = {}
+var pending_load: Dictionary = {}
 var transitioning := false
 var fade_rect: ColorRect
 
@@ -29,6 +37,58 @@ func set_transfer_data(data: Dictionary) -> void:
 
 func get_transfer_data() -> Dictionary:
 	return transfer_data.duplicate(true)
+
+func save_game(map_id: StringName, scene_path: String, position: Vector2) -> bool:
+	if not MAP_SCENES.has(String(map_id)) or MAP_SCENES[String(map_id)] != scene_path:
+		return false
+	var data := {
+		"version": SAVE_VERSION,
+		"map": String(map_id),
+		"scene": scene_path,
+		"position": [position.x, position.y],
+		"transfer": transfer_data.duplicate(true)
+	}
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(JSON.stringify(data))
+	file.close()
+	return true
+
+func load_game(current_map_id: StringName) -> bool:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return false
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	file.close()
+	if not parsed is Dictionary:
+		return false
+	var data: Dictionary = parsed
+	var saved_map := String(data.get("map", ""))
+	var scene_path := String(data.get("scene", ""))
+	var position: Variant = data.get("position")
+	var saved_transfer: Variant = data.get("transfer")
+	if data.get("version") != SAVE_VERSION or not MAP_SCENES.has(saved_map) or MAP_SCENES[saved_map] != scene_path:
+		return false
+	if not position is Array or position.size() != 2 or not saved_transfer is Dictionary:
+		return false
+	for coordinate in position:
+		if not (coordinate is int or coordinate is float):
+			return false
+	transfer_data = saved_transfer.duplicate(true)
+	pending_load = {"map": saved_map, "position": Vector2(float(position[0]), float(position[1]))}
+	if saved_map != String(current_map_id):
+		transition_to(scene_path, &"default")
+	return true
+
+func take_loaded_position(map_id: StringName) -> Vector2:
+	if pending_load.is_empty() or pending_load.get("map") != String(map_id):
+		return Vector2.INF
+	var position: Vector2 = pending_load.position
+	pending_load.clear()
+	return position
 
 func transition_to(scene_path: String, spawn_id: StringName = &"default") -> void:
 	if transitioning:

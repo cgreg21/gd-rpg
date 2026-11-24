@@ -138,6 +138,11 @@ func _initialize() -> void:
 	# Save and restore the complete Valbrume quest state.
 	var saved_position: Vector2 = demo.get("player").position
 	assert(demo._save_game(), "Demo progress must save")
+	var village_save := FileAccess.open("user://valbrume_save.json", FileAccess.READ)
+	var village_data: Variant = JSON.parse_string(village_save.get_as_text())
+	village_save.close()
+	assert(village_data.scene == "res://examples/demo/demo.tscn", "Village save must include its scene path")
+	assert(village_data.transfer.door_opened and village_data.transfer.slime_defeated, "Save must include transferable quest state")
 	demo._collect_crystal()
 	demo.set("gold", 0)
 	demo.set("experience", 0)
