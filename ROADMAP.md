@@ -54,7 +54,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add top-down character movement.
 - [x] Add the interactable contract.
 - [x] Add dialogue resource and dialogue runner foundations.
-- [x] Add the ATB timer foundation.
+- [x] Add a reusable ATB gauge manager with per-battler speed, ready signals and explicit turn consumption.
 - [x] Add a playable JRPG village quest with an original animated hero, NPC dialogue, collectible and enemy encounter.
 - [x] Add GitHub Actions CI with headless editor validation and runtime smoke test.
 
@@ -127,10 +127,10 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ## P3 — Battle system
 
-**Progress:** Valbrume now demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. This is a deliberately small turn-based demonstration; the reusable ATB state machine, party/target model, data-driven skills and rewards are still planned.
+**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. Connecting this manager to the demo's command flow, then adding party/target data and rewards, remains planned.
 
 ### P3.1 — Battle loop
-- [ ] Turn the ATB timer foundation into a complete battle state machine.
+- [~] Turn the ATB timer foundation into a complete battle state machine (reusable gauge lifecycle is implemented; command orchestration remains).
 - [ ] Add battle start/end flow and party/enemy sides.
 - [x] Add a first playable battle command menu in Valbrume (attack, skill, item, defend); reusable battle-state integration remains.
 - [ ] Add target selection and valid-target rules.
@@ -214,7 +214,7 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Keep reusable engine code under `addons/gd_rpg/`; keep demo-specific code under `examples/`.
 - [x] Add headless tests for named map spawn lookup and default fallback.
 - [x] Add headless tests for map spawn fallback and pixel-camera snapping.
-- [ ] Expand tests for remaining runtime systems.
+- [x] Add headless tests for the reusable ATB gauge lifecycle.\n- [ ] Expand tests for remaining runtime systems.
 - [x] Add a reproducible automated screenshot capture for visual behavior (GitHub Actions/Xvfb); retain manual checks on physical displays.
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
