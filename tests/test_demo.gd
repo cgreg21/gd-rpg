@@ -32,6 +32,12 @@ func _initialize() -> void:
 	assert(route.has_spawn_point(&"village_gate"), "Route must expose its village entry spawn")
 	assert(route.has_spawn_point(&"default"), "Route must expose a default spawn")
 	assert(route.get("return_portal") != null, "Route must provide a portal back to the village")
+	RPGMapRouter.set_transfer_data({"gold": 15})
+	assert(RPGMapRouter.save_game(&"valbrume_route", "res://examples/demo/route.tscn", Vector2(222, 144)), "Forest route must be saveable")
+	route.get("player").position = Vector2.ZERO
+	route.call("_load_map_save")
+	assert(route.get("player").position == Vector2(222, 144), "Forest route must restore its saved position")
+	RPGMapRouter.set_transfer_data({})
 	route.queue_free()
 	await process_frame
 	assert(demo.get("dialogue_runner") is RPGDialogueRunner, "Demo must use the dialogue runner")

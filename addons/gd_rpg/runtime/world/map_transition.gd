@@ -77,10 +77,35 @@ func load_game(current_map_id: StringName) -> bool:
 	for coordinate in position:
 		if not (coordinate is int or coordinate is float):
 			return false
+	if not _is_valid_transfer(saved_transfer):
+		return false
 	transfer_data = saved_transfer.duplicate(true)
 	pending_load = {"map": saved_map, "position": Vector2(float(position[0]), float(position[1]))}
 	if saved_map != String(current_map_id):
 		transition_to(scene_path, &"default")
+	return true
+
+func _is_valid_transfer(data: Dictionary) -> bool:
+	if data.is_empty():
+		return true
+	for key in ["hp", "mp", "experience", "gold"]:
+		var value: Variant = data.get(key)
+		if not (value is int or value is float) or int(value) != value:
+			return false
+	if data.hp < 1 or data.hp > 5 or data.mp < 0 or data.mp > 3 or data.experience < 0 or data.gold < 0:
+		return false
+	for key in ["has_crystal", "chest_opened", "door_opened", "slime_defeated"]:
+		if not data.get(key) is bool:
+			return false
+	var items: Variant = data.get("inventory")
+	if not items is Dictionary:
+		return false
+	for item_id in items:
+		var amount: Variant = items[item_id]
+		if not item_id in ["potion", "old_key"] or not (amount is int or amount is float) or int(amount) != amount or amount < 0:
+			return false
+	if items.get("potion", 0) > 9 or items.get("old_key", 0) > 1:
+		return false
 	return true
 
 func take_loaded_position(map_id: StringName) -> Vector2:
