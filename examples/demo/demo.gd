@@ -3,7 +3,6 @@ extends RPGMap
 var player: RPGCharacter
 var dialogue_label: Label
 var dialogue_runner: RPGDialogueRunner
-var crt_overlay: RPGCRTOverlay
 
 func _ready() -> void:
 	map_id = &"demo"
@@ -73,16 +72,6 @@ func _build_demo() -> void:
 	dialogue_runner.line_started.connect(func(text: String, _index: int) -> void: dialogue_label.text = text)
 	dialogue_runner.dialogue_finished.connect(func() -> void: dialogue_label.text = "Explore. E: talk  |  F3: CRT")
 
-	var crt_layer := CanvasLayer.new()
-	crt_layer.layer = 10
-	add_child(crt_layer)
-	crt_overlay = RPGCRTOverlay.new()
-	var shader_material := ShaderMaterial.new()
-	shader_material.shader = preload("res://addons/gd_rpg/runtime/display/crt.gdshader")
-	crt_overlay.material = shader_material
-	crt_overlay.enabled = OS.get_environment("GD_RPG_SCREENSHOT_CRT") == "1"
-	crt_layer.add_child(crt_overlay)
-
 func _start_intro() -> void:
 	var intro := RPGDialogue.new()
 	intro.dialogue_id = &"intro"
@@ -90,8 +79,6 @@ func _start_intro() -> void:
 	dialogue_runner.start(intro)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-		crt_overlay.enabled = not crt_overlay.enabled
 	if event.is_action_pressed("interact") and player != null and player.position.distance_to(Vector2(320, 140)) < 100.0:
 		var dialogue := RPGDialogue.new()
 		dialogue.dialogue_id = &"traveller"
