@@ -34,7 +34,7 @@ capture_scene() {
   fi
 
   sleep 3
-  if grep -E "SCRIPT ERROR:|ERROR: Failed to load script" "$OUTPUT_DIR/$name.log"; then
+  if grep -E "SCRIPT ERROR:|ERROR: Failed to load script|SHADER ERROR:|Shader compilation failed" "$OUTPUT_DIR/$name.log"; then
     cat "$OUTPUT_DIR/$name.log"
     echo "Godot reported a script loading error for $name." >&2
     kill "$pid" 2>/dev/null || true
