@@ -7,12 +7,11 @@ uniform float crt_enabled : hint_range(0.0, 1.0) = 0.0;
 uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform float curvature : hint_range(0.0, 0.20) = 0.085;
 uniform float curvature_vertical : hint_range(0.0, 0.20) = 0.075;
-uniform float scanline_strength : hint_range(0.0, 1.0) = 0.22;
+uniform float scanline_strength : hint_range(0.0, 1.0) = 0.48;
 uniform float grille_strength : hint_range(0.0, 1.0) = 0.10;
 uniform float vignette_strength : hint_range(0.0, 1.0) = 0.28;
 uniform float chromatic_aberration : hint_range(0.0, 0.02) = 0.0015;
 uniform float bloom_strength : hint_range(0.0, 1.0) = 0.08;
-uniform float corner_roundness : hint_range(0.0, 1.0) = 0.35;
 uniform float corner_roundness : hint_range(0.0, 1.0) = 0.35;
 
 const float SCREEN_INSET = 0.055;
@@ -56,7 +55,9 @@ void fragment() {
 	glow *= 0.25;
 	image += max(glow - image, vec3(0.0)) * bloom_strength * crt_enabled;
 
-	float scanline = 1.0 - scanline_strength * (0.5 + 0.5 * cos(screen_uv.y / SCREEN_PIXEL_SIZE.y * 3.14159265));
+	// Three-output-pixel cadence makes scanlines readable after 3x upscaling.
+	float scanline_phase = mod(FRAGCOORD.y, 3.0) / 3.0;
+	float scanline = 1.0 - scanline_strength * (0.5 + 0.5 * cos(scanline_phase * 6.2831853));
 	float grille_phase = mod(floor(screen_uv.x / SCREEN_PIXEL_SIZE.x), 3.0);
 	vec3 grille = vec3(1.0 - grille_strength * 0.35);
 	if (grille_phase < 1.0) {
