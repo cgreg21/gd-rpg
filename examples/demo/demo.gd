@@ -66,6 +66,7 @@ func _build_demo() -> void:
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = preload("res://addons/gd_rpg/runtime/display/crt.gdshader")
 	crt_overlay.material = shader_material
+	crt_overlay.enabled = OS.get_environment("GD_RPG_SCREENSHOT_CRT") == "1"
 	crt_layer.add_child(crt_overlay)
 
 func _start_intro() -> void:
