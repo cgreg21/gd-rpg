@@ -1,6 +1,6 @@
 extends ColorRect
 class_name RPGCRTOverlay
-## Full-screen CRT pass: framebuffer sampling, barrel curvature, RGB mask and phosphor shading.
+## Final CRT glass and housing pass. The bezel is always visible; F3 toggles phosphor effects.
 
 @export_range(0.0, 1.0, 0.01) var effect_strength: float = 1.0:
 	set(value):
@@ -50,11 +50,12 @@ class_name RPGCRTOverlay
 @export var enabled: bool = false:
 	set(value):
 		enabled = value
-		visible = value
+		_update_material()
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	visible = true
 	_update_material()
 
 func set_preset(preset: StringName) -> void:
@@ -93,6 +94,7 @@ func _update_material() -> void:
 	var shader_material := material as ShaderMaterial
 	if shader_material == null:
 		return
+	shader_material.set_shader_parameter("crt_enabled", 1.0 if enabled else 0.0)
 	shader_material.set_shader_parameter("strength", effect_strength)
 	shader_material.set_shader_parameter("curvature", curvature)
 	shader_material.set_shader_parameter("curvature_vertical", curvature_vertical)
