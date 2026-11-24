@@ -96,7 +96,11 @@ func _initialize() -> void:
 	demo.set("slime_defeated", false)
 	demo.get("player").position = Vector2.ZERO
 	demo.get("inventory").add_item(&"potion", 1)
-	assert(demo._load_game(), "A valid save must load")
+	var loaded := demo._load_game()
+	assert(loaded, "A valid save must load: %s" % demo.get("dialogue_label").text)
+	if not loaded:
+		quit(1)
+		return
 	assert(demo.get("player").position == saved_position, "Loading must restore player position")
 	assert(demo.get("gold") == 45 and demo.get("experience") == 20, "Loading must restore currency and experience")
 	assert(not demo.get("has_crystal") and demo.get("chest_opened") and demo.get("door_opened") and demo.get("slime_defeated"), "Loading must restore quest flags")
