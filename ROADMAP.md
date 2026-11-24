@@ -43,7 +43,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Provide clean, subtle CRT and stronger retro presets, plus a fully disabled mode.
 - [~] Verify pixel readability, shader performance and visual quality across physical displays and integrated GPUs.
 
-**Visual acceptance:** at integer scale, source pixels remain crisp and stable during movement; the CRT effect can be toggled without changing gameplay or breaking UI readability. The clean mode must look correct without any CRT shader.
+**Visual acceptance:** the 640×360 source renders at exact 3× scale on a 1920×1080 display; pixels remain crisp and stable during movement. The CRT effect can be toggled without changing gameplay or breaking UI readability. The clean mode must look correct without any CRT shader.
 
 ## P0 — Project foundation
 
