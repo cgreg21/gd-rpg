@@ -42,7 +42,7 @@ The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside
 - **Advance dialogue:** Enter
 - **Toggle CRT:** F3
 
-Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path. The encounter demonstrates a small command menu, MP-consuming skill, healing potion, defensive stance and enemy counterattacks.
+Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path. The encounter demonstrates a small command menu, MP-consuming skill, healing potion, defensive stance and enemy counterattacks. The reusable `RPGATBBattle` node is available at `addons/gd_rpg/runtime/battle/atb_battle.gd`: it manages per-battler charge rates, ready states and explicit turn consumption. See its headless coverage in `tests/test_atb.gd`.
 
 ## World and camera foundations
 
