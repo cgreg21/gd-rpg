@@ -2,7 +2,7 @@
 
 A practical, incremental plan for a reusable 2D JRPG engine built with Godot 4 and GDScript.
 
-The target is the feel and systems of classic 16-bit JRPGs: readable top-down exploration, story-driven events, a memorable party, and an Active Time Battle (ATB) combat loop. The visual target is **pixel-perfect 2D with an optional CRT display shader**, inspired by the presentation of 16-bit console RPGs. The project will use original sample content and assets; it will not depend on proprietary game data.
+The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: readable top-down exploration, story-driven events, a memorable party, and an Active Time Battle (ATB) combat loop. The visual target is **pixel-perfect 2D with an optional CRT display shader**, inspired by the presentation of 16-bit and 32-bit console RPGs. The project will use original sample content and assets; it will not depend on proprietary game data.
 
 **Status legend:** [x] Done · [~] In progress · [ ] Planned
 
@@ -21,8 +21,9 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 ## Visual direction — pixel-perfect 16-bit + CRT
 
 ### Pixel-perfect rendering rules
-- [x] Set the virtual resolution to 320×180, with a documented 16:9 presentation.
-- [x] Open the game at 1920×1080 Full HD by default (exact 6× integer scale).
+- [x] Set the virtual resolution to 640×360, with a documented 16:9 presentation.
+- [x] Raise the internal pixel budget to 640×360 (4× the pixels of 320×180) for finer 32-bit-era art, while retaining 3× integer scaling to Full HD.
+- [x] Open the game at 1920×1080 Full HD by default (exact 3× integer scale).
 - [x] Add a GitHub Actions visual capture workflow for demo/pixel-test scenes, clean and CRT, at 1080p.
 - [x] Configure viewport stretching with integer scaling; Godot uses letterboxing/pillarboxing rather than fractional pixel scaling.
 - [x] Set the default window size to 1920×1080 (Full HD, 16:9).
@@ -72,7 +73,7 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
 - [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay is now a real screen-texture pass: it warps the framebuffer with barrel curvature, clips rounded corners, and applies scanlines, an RGB phosphor grille, vignette, chromatic aberration and a restrained glow. All parameters are exposed on `RPGCRTOverlay`; clean, subtle and strong presets are available. Automated screenshot captures verify that the enabled pass changes the final image; the current 1920×1080 clean/CRT captures are published in `docs/screenshots/`. Physical-display readability and performance checks remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
+**Progress:** the project now runs at 640×360 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay is now a real screen-texture pass: it warps the framebuffer with barrel curvature, clips rounded corners, and applies scanlines, an RGB phosphor grille, vignette, chromatic aberration and a restrained glow. All parameters are exposed on `RPGCRTOverlay`; clean, subtle and strong presets are available. Automated screenshot captures verify that the enabled pass changes the final image; the current 1920×1080 clean/CRT captures are published in `docs/screenshots/`. Physical-display readability and performance checks remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
