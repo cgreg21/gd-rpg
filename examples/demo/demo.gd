@@ -20,8 +20,12 @@ var crystal: Node2D
 var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
+var player_mp := 3
+var potion_count := 1
 var slime_hp := 3
 var battle_active := false
+var defending := false
+var battle_label: Label
 var message_time := 0.0
 
 func _ready() -> void:
@@ -52,10 +56,21 @@ func _process(delta: float) -> void:
 		status_label.text = _objective_text()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("interact") or player == null:
+	if player == null:
 		return
 	if battle_active:
-		_battle_turn()
+		if event is InputEventKey and event.pressed and not event.echo:
+			match event.keycode:
+				KEY_1, KEY_E, KEY_ENTER:
+					_battle_action("attack")
+				KEY_2:
+					_battle_action("skill")
+				KEY_3:
+					_battle_action("item")
+				KEY_4:
+					_battle_action("defend")
+		return
+	if not event.is_action_pressed("interact"):
 		return
 	var distance_npc := player.global_position.distance_to(NPC_POSITION)
 	var distance_crystal := player.global_position.distance_to(CRYSTAL_POSITION)
@@ -185,7 +200,7 @@ func _build_hud() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
 	hp_label = Label.new()
-	hp_label.text = "PV  5/5"
+	hp_label.text = "PV 5/5  •  PM 3/3"
 	hp_label.add_theme_color_override("font_color", Color("#9de0a0"))
 	hp_label.add_theme_font_size_override("font_size", 15)
 	row.add_child(hp_label)
@@ -234,42 +249,110 @@ func _collect_crystal() -> void:
 
 func _start_battle() -> void:
 	battle_active = true
+	defending = false
 	player.set_input_enabled(false)
-	_show_message("Un SLIME surgit ! Appuie sur E pour attaquer.")
+	_show_message("Un SLIME surgit ! Choisis une commande.")
 	_draw_battle_overlay(true)
 
-func _battle_turn() -> void:
-	slime_hp -= 1
-	if slime_hp <= 0:
+func _battle_action(action: String) -> void:
+	var damage := 0
+	match action:
+		"attack":
+			damage = 1
+		"skill":
+			if player_mp < 2:
+				_show_message("Pas assez de PM pour Éclat azur.")
+				return
+			player_mp -= 2
+			damage = 2
+		"item":
+			if potion_count <= 0:
+				_show_message("Tu n'as plus de potion.")
+				return
+			if player_hp == 5:
+				_show_message("Tes PV sont déjà au maximum.")
+				return
+			potion_count -= 1
+			player_hp = mini(5, player_hp + 3)
+			defending = false
+			_update_battle_hud()
+			_show_message("Potion utilisée : 3 PV récupérés.")
+			_enemy_turn()
+			return
+		"defend":
+			defending = true
+			_show_message("Tu te mets en garde.")
+			_enemy_turn()
+			return
+		_:
+			return
+	slime_hp = maxi(0, slime_hp - damage)
+	if slime_hp == 0:
+		_end_battle(true)
+		return
+	_show_message("Tu infliges %d dégâts au slime." % damage)
+	_enemy_turn()
+
+func _enemy_turn() -> void:
+	if not battle_active:
+		return
+	if defending:
+		defending = false
+		_show_message("Tu bloques complètement la riposte !")
+	else:
+		player_hp = maxi(0, player_hp - 1)
+		_show_message("Le slime riposte : 1 dégât.")
+	_update_battle_hud()
+	if player_hp <= 0:
+		_end_battle(false)
+		return
+	_update_battle_overlay()
+
+func _end_battle(victory: bool) -> void:
+	battle_active = false
+	player.set_input_enabled(true)
+	_draw_battle_overlay(false)
+	if victory:
 		slime_defeated = true
-		battle_active = false
-		player.set_input_enabled(true)
 		slime.queue_free()
-		_draw_battle_overlay(false)
 		_show_message("Victoire ! Le slime disparaît dans une lueur. Valbrume est sauvée.")
 		status_label.text = _objective_text()
 	else:
-		player_hp = maxi(0, player_hp - 1)
-		hp_label.text = "PV  %d/5" % player_hp
-		_show_message("Tu frappes le slime ! Il reste %d PV. Le monstre riposte !" % slime_hp)
+		player_hp = 1
+		_update_battle_hud()
+		_show_message("Tu es épuisé. Lila te soigne et le slime reprend sa place.")
+		slime_hp = 3
+
+func _update_battle_hud() -> void:
+	hp_label.text = "PV %d/5  •  PM %d/3" % [player_hp, player_mp]
+
+func _update_battle_overlay() -> void:
+	if battle_label == null or not is_instance_valid(battle_label):
+		return
+	battle_label.text = _battle_menu_text()
+
+func _battle_menu_text() -> String:
+	return "COMBAT  •  SLIME %d PV\\n1 Attaquer   2 Éclat azur (2 PM)\\n3 Potion (%d)   4 Défendre" % [slime_hp, potion_count]
 
 func _draw_battle_overlay(show: bool) -> void:
 	var existing := get_node_or_null("BattleHint")
 	if existing != null:
 		existing.queue_free()
+	battle_label = null
 	if not show:
 		return
 	var panel := PanelContainer.new()
 	panel.name = "BattleHint"
-	panel.position = Vector2(205, 92)
-	panel.size = Vector2(230, 82)
+	panel.position = Vector2(115, 92)
+	panel.size = Vector2(410, 92)
 	panel.add_theme_stylebox_override("panel", _panel_style("#202c4b", "#e7c879"))
-	var label := Label.new()
-	label.text = "COMBAT\nSLIME  %d PV\nE : Attaquer" % slime_hp
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Color("#fff0c8"))
-	label.add_theme_font_size_override("font_size", 16)
-	panel.add_child(label)
+	battle_label = Label.new()
+	battle_label.text = _battle_menu_text()
+	battle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	battle_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	battle_label.add_theme_color_override("font_color", Color("#fff0c8"))
+	battle_label.add_theme_font_size_override("font_size", 14)
+	panel.add_child(battle_label)
 	add_child(panel)
 
 func _update_prompt() -> void:
