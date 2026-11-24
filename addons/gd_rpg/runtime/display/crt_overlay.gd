@@ -1,6 +1,6 @@
 extends ColorRect
 class_name RPGCRTOverlay
-## Final CRT glass and housing pass. The bezel is always visible; F3 toggles phosphor effects.
+## Optional full-screen CRT post-process. No frame or bezel is drawn.
 
 @export_range(0.0, 1.0, 0.01) var effect_strength: float = 1.0:
 	set(value):
@@ -42,11 +42,6 @@ class_name RPGCRTOverlay
 		bloom_strength = clampf(value, 0.0, 1.0)
 		_update_material()
 
-@export_range(0.0, 1.0, 0.01) var corner_roundness: float = 0.35:
-	set(value):
-		corner_roundness = clampf(value, 0.0, 1.0)
-		_update_material()
-
 @export var enabled: bool = false:
 	set(value):
 		enabled = value
@@ -63,9 +58,9 @@ func set_preset(preset: StringName) -> void:
 		&"clean":
 			enabled = false
 		&"crt":
-			_apply_preset(0.075, 0.065, 0.38, 0.08, 0.22, 0.001, 0.04, 0.25)
+			_apply_preset(0.075, 0.065, 0.38, 0.08, 0.22, 0.001, 0.04)
 		&"crt_strong":
-			_apply_preset(0.12, 0.10, 0.52, 0.14, 0.36, 0.0025, 0.12, 0.45)
+			_apply_preset(0.12, 0.10, 0.52, 0.14, 0.36, 0.0025, 0.12)
 		_:
 			push_warning("Unknown CRT preset: %s" % preset)
 
@@ -76,8 +71,7 @@ func _apply_preset(
 	new_grille: float,
 	new_vignette: float,
 	new_aberration: float,
-	new_bloom: float,
-	new_corners: float
+	new_bloom: float
 ) -> void:
 	curvature = new_curvature
 	curvature_vertical = new_vertical_curvature
@@ -86,7 +80,6 @@ func _apply_preset(
 	vignette_strength = new_vignette
 	chromatic_aberration = new_aberration
 	bloom_strength = new_bloom
-	corner_roundness = new_corners
 	enabled = true
 	_update_material()
 
@@ -103,4 +96,3 @@ func _update_material() -> void:
 	shader_material.set_shader_parameter("vignette_strength", vignette_strength)
 	shader_material.set_shader_parameter("chromatic_aberration", chromatic_aberration)
 	shader_material.set_shader_parameter("bloom_strength", bloom_strength)
-	shader_material.set_shader_parameter("corner_roundness", corner_roundness)
