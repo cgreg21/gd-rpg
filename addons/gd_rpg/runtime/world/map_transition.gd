@@ -4,6 +4,7 @@ extends CanvasLayer
 const FADE_DURATION := 0.25
 
 var pending_spawn_id: StringName
+var transfer_data: Dictionary = {}
 var transitioning := false
 var fade_rect: ColorRect
 
@@ -22,6 +23,12 @@ func take_spawn_id() -> StringName:
 	var spawn_id := pending_spawn_id
 	pending_spawn_id = &""
 	return spawn_id
+
+func set_transfer_data(data: Dictionary) -> void:
+	transfer_data = data.duplicate(true)
+
+func get_transfer_data() -> Dictionary:
+	return transfer_data.duplicate(true)
 
 func transition_to(scene_path: String, spawn_id: StringName = &"default") -> void:
 	if transitioning:
