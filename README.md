@@ -49,7 +49,7 @@ The final display pass is a borderless full-screen CRT effect. F3 toggles curvat
 
 ## Playable demo — Valbrume
 
-The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
+The reusable inventory uses `RPGItemData` Resources and an `RPGInventory` node for stack limits, quantities, additions and removals. Valbrume starts with one Potion (3 PV); command 3 consumes it from the inventory, and headless tests cover stacking limits and invalid operations.\n\nThe demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
 
 - **Move:** arrow keys
 - **Interact / collect:** E

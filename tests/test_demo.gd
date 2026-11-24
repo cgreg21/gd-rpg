@@ -13,6 +13,8 @@ func _initialize() -> void:
 	assert(demo.get("crystal") != null, "Demo must create its collectible")
 	assert(demo.get("slime") != null, "Demo must create its encounter")
 	assert(demo.get("dialogue_runner") is RPGDialogueRunner, "Demo must use the dialogue runner")
+	assert(demo.get("inventory") is RPGInventory, "Demo must use the reusable inventory")
+	assert(demo.get("inventory").count(&"potion") == 1, "Demo must start with one potion")
 
 	var animation := demo.get("hero_animation") as AnimatedSprite2D
 	for direction in ["front", "back", "left", "right"]:
@@ -26,7 +28,7 @@ func _initialize() -> void:
 	assert(demo.get("player_mp") == 1, "The skill must consume two MP")
 	assert(demo.get("player_hp") == 4, "The enemy must counter after the skill")
 	demo._battle_action("item")
-	assert(demo.get("potion_count") == 0, "Using an item must consume one potion")
+	assert(demo.get("inventory").count(&"potion") == 0, "Using an item must consume one potion")
 	assert(demo.get("player_hp") == 4, "The potion must heal before the enemy counter")
 	demo._battle_action("defend")
 	assert(demo.get("player_hp") == 4, "Defend must block the enemy counter")

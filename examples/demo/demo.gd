@@ -23,7 +23,7 @@ var player_hp := 5
 var player_mp := 3
 var experience := 0
 var gold := 0
-var potion_count := 1
+var inventory: RPGInventory
 var slime_hp := 3
 var battle_active := false
 var defending := false
@@ -35,6 +35,7 @@ func _ready() -> void:
 	_build_world()
 	_build_player()
 	_build_characters()
+	_build_inventory()
 	_build_hud()
 	_show_message("Valbrume — Parle à Lila, récupère le cristal et chasse le slime !")
 
@@ -183,6 +184,19 @@ func _build_characters() -> void:
 	_draw_slime(slime)
 	_add_name_tag(slime, "Slime")
 
+func _build_inventory() -> void:
+	inventory = RPGInventory.new()
+	inventory.name = "Inventory"
+	add_child(inventory)
+	var potion := RPGItemData.new()
+	potion.item_id = &"potion"
+	potion.display_name = "Potion"
+	potion.description = "Restaure 3 PV."
+	potion.max_stack = 9
+	potion.hp_restore = 3
+	inventory.register_item(potion)
+	inventory.add_item(potion.item_id)
+
 func _build_hud() -> void:
 	var ui := CanvasLayer.new()
 	add_child(ui)
@@ -270,17 +284,18 @@ func _battle_action(action: String) -> void:
 			player_mp -= 2
 			damage = 2
 		"item":
-			if potion_count <= 0:
+			var potion := inventory.get_item(&"potion")
+			if inventory.count(&"potion") == 0 or potion == null:
 				_show_message("Tu n'as plus de potion.")
 				return
 			if player_hp == 5:
 				_show_message("Tes PV sont déjà au maximum.")
 				return
-			potion_count -= 1
-			player_hp = mini(5, player_hp + 3)
+			inventory.remove_item(&"potion")
+			player_hp = mini(5, player_hp + potion.hp_restore)
 			defending = false
 			_update_battle_hud()
-			_show_message("Potion utilisée : 3 PV récupérés.")
+			_show_message("Potion utilisée : %d PV récupérés." % potion.hp_restore)
 			_enemy_turn()
 			return
 		"defend":
@@ -342,7 +357,7 @@ func _update_battle_overlay() -> void:
 	battle_label.text = _battle_menu_text()
 
 func _battle_menu_text() -> String:
-	return "COMBAT  •  SLIME %d PV\\n1 Attaquer   2 Éclat azur (2 PM)\\n3 Potion (%d)   4 Défendre" % [slime_hp, potion_count]
+	return "COMBAT  •  SLIME %d PV\\n1 Attaquer   2 Éclat azur (2 PM)\\n3 Potion (%d)   4 Défendre" % [slime_hp, inventory.count(&"potion")]
 
 func _draw_battle_overlay(show: bool) -> void:
 	var existing := get_node_or_null("BattleHint")
