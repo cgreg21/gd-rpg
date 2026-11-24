@@ -22,7 +22,8 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 
 ### Pixel-perfect rendering rules
 - [x] Set the virtual resolution to 320×180, with a documented 16:9 presentation.
-- [x] Open the game at 1920×1080 Full HD by default (exact 6× integer scale).\n- [x] Add a GitHub Actions visual capture workflow for demo/pixel-test scenes, clean and CRT, at 1080p.
+- [x] Open the game at 1920×1080 Full HD by default (exact 6× integer scale).
+- [x] Add a GitHub Actions visual capture workflow for demo/pixel-test scenes, clean and CRT, at 1080p.
 - [x] Configure viewport stretching with integer scaling; Godot uses letterboxing/pillarboxing rather than fractional pixel scaling.
 - [x] Set the default window size to 1920×1080 (Full HD, 16:9).
 - [x] Set nearest-neighbor canvas texture filtering as the project default.
