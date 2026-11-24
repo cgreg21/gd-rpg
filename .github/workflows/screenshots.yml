@@ -29,6 +29,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes xvfb imagemagick xdotool
 
+      - name: Import Godot project and register global classes
+        run: godot --headless --editor --path . --quit
+
       - name: Capture 1080p scenes
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
@@ -41,6 +44,9 @@ jobs:
           test -s artifacts/screenshots/pixel-test.png
           test -s artifacts/screenshots/pixel-test_crt.png
           identify artifacts/screenshots/*.png
+          for image in artifacts/screenshots/*.png; do
+            test "$(stat -c%s "$image")" -gt 10000 || { echo "Screenshot is unexpectedly small: $image"; exit 1; }
+          done
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
