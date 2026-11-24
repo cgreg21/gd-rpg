@@ -8,7 +8,7 @@
 - [x] Add ATB battle loop foundation
 - [x] Add asset-free playable demo
 - [x] Add CI validation workflow
-- [ ] Run Godot headless import and smoke tests on CI
+- [x] Run Godot headless import and smoke tests on CI
 
 ## P1 — Core JRPG systems
 - [ ] Map transitions, spawn points and persistent map state
