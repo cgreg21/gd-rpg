@@ -6,14 +6,16 @@ var crt_overlay: RPGCRTOverlay
 
 func _ready() -> void:
 	queue_redraw()
+	var crt_layer := CanvasLayer.new()
+	crt_layer.layer = 10
+	add_child(crt_layer)
 	crt_overlay = RPGCRTOverlay.new()
 	crt_overlay.name = "CRTOverlay"
-	crt_overlay.set_script(load("res://addons/gd_rpg/runtime/display/crt_overlay.gd"))
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = load("res://addons/gd_rpg/runtime/display/crt.gdshader")
 	crt_overlay.material = shader_material
 	crt_overlay.enabled = OS.get_environment("GD_RPG_SCREENSHOT_CRT") == "1"
-	add_child(crt_overlay)
+	crt_layer.add_child(crt_overlay)
 	var ui := CanvasLayer.new()
 	add_child(ui)
 	var label := Label.new()
