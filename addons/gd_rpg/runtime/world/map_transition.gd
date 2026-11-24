@@ -2,8 +2,9 @@ extends CanvasLayer
 ## Replaces the active RPGMap inside RPGDisplayRoot with a short fade.
 
 const FADE_DURATION := 0.25
-const SAVE_PATH := "user://valbrume_save.json"
-const SAVE_VERSION := 2
+const SAVE_PATH := "user://valbrume_save.sav"
+const SAVE_MAGIC := 0x47525047
+const SAVE_VERSION := 3
 const MAP_SCENES := {
 	"valbrume": "res://examples/demo/demo.tscn",
 	"valbrume_route": "res://examples/demo/route.tscn",
@@ -42,7 +43,6 @@ func save_game(map_id: StringName, scene_path: String, position: Vector2) -> boo
 	if not MAP_SCENES.has(String(map_id)) or MAP_SCENES[String(map_id)] != scene_path:
 		return false
 	var data := {
-		"version": SAVE_VERSION,
 		"map": String(map_id),
 		"scene": scene_path,
 		"position": [position.x, position.y],
@@ -51,9 +51,12 @@ func save_game(map_id: StringName, scene_path: String, position: Vector2) -> boo
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		return false
-	file.store_string(JSON.stringify(data))
+	file.store_32(SAVE_MAGIC)
+	file.store_32(SAVE_VERSION)
+	file.store_var(data, false)
+	var save_error := file.get_error()
 	file.close()
-	return true
+	return save_error == OK
 
 func load_game(current_map_id: StringName) -> bool:
 	if not FileAccess.file_exists(SAVE_PATH):
@@ -61,21 +64,25 @@ func load_game(current_map_id: StringName) -> bool:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
 		return false
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if file.get_32() != SAVE_MAGIC or file.get_32() != SAVE_VERSION:
+		file.close()
+		return false
+	var parsed: Variant = file.get_var(false)
+	var read_error := file.get_error()
 	file.close()
-	if not parsed is Dictionary:
+	if read_error != OK or not parsed is Dictionary:
 		return false
 	var data: Dictionary = parsed
 	var saved_map := String(data.get("map", ""))
 	var scene_path := String(data.get("scene", ""))
 	var position: Variant = data.get("position")
 	var saved_transfer: Variant = data.get("transfer")
-	if data.get("version") != SAVE_VERSION or not MAP_SCENES.has(saved_map) or MAP_SCENES[saved_map] != scene_path:
+	if not MAP_SCENES.has(saved_map) or MAP_SCENES[saved_map] != scene_path:
 		return false
 	if not position is Array or position.size() != 2 or not saved_transfer is Dictionary:
 		return false
 	for coordinate in position:
-		if not (coordinate is int or coordinate is float):
+		if not (coordinate is int or coordinate is float) or not is_finite(float(coordinate)):
 			return false
 	if not _is_valid_transfer(saved_transfer):
 		return false

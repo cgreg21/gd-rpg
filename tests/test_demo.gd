@@ -144,8 +144,10 @@ func _initialize() -> void:
 	# Save and restore the complete Valbrume quest state.
 	var saved_position: Vector2 = demo.get("player").position
 	assert(demo._save_game(), "Demo progress must save")
-	var village_save := FileAccess.open("user://valbrume_save.json", FileAccess.READ)
-	var village_data: Variant = JSON.parse_string(village_save.get_as_text())
+	var village_save := FileAccess.open("user://valbrume_save.sav", FileAccess.READ)
+	assert(village_save.get_32() == 0x47525047, "Demo save must use the binary signature")
+	assert(village_save.get_32() == 3, "Demo save must use the binary format version")
+	var village_data: Variant = village_save.get_var(false)
 	village_save.close()
 	assert(village_data.scene == "res://examples/demo/demo.tscn", "Village save must include its scene path")
 	assert(village_data.transfer.door_opened and village_data.transfer.slime_defeated, "Save must include transferable quest state")
