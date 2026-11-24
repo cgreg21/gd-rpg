@@ -8,6 +8,8 @@ const SLIME_POSITION := Vector2(190, 145)
 const CRYSTAL_POSITION := Vector2(520, 270)
 const CHEST_POSITION := Vector2(570, 235)
 const DOOR_POSITION := Vector2(570, 175)
+const SAVE_PATH := "user://valbrume_save.json"
+const SAVE_VERSION := 1
 
 var player: RPGCharacter
 var hero_animation: AnimatedSprite2D
@@ -70,6 +72,13 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if player == null:
 		return
+	if event is InputEventKey and event.pressed and not event.echo and not battle_active:
+		if event.keycode == KEY_F5:
+			_save_game()
+			return
+		if event.keycode == KEY_F9:
+			_load_game()
+			return
 	if inventory_open:
 		if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_I, KEY_ESCAPE]:
 			_toggle_inventory()
@@ -327,6 +336,111 @@ func _update_inventory_menu() -> void:
 		lines.append("Aucun objet.")
 	lines.append("I / Échap : fermer")
 	inventory_label.text = "\\n".join(lines)
+
+
+func _save_game() -> bool:
+	if battle_active or inventory_open:
+		_show_message("Sauvegarde indisponible pendant un menu ou un combat.")
+		return false
+	var items: Dictionary = {}
+	for item_id in inventory.item_ids():
+		items[String(item_id)] = inventory.count(item_id)
+	var data := {
+		"version": SAVE_VERSION,
+		"map": String(map_id),
+		"player_position": [player.position.x, player.position.y],
+		"hp": player_hp,
+		"mp": player_mp,
+		"experience": experience,
+		"gold": gold,
+		"inventory": items,
+		"has_crystal": has_crystal,
+		"chest_opened": chest_opened,
+		"door_opened": door_opened,
+		"slime_defeated": slime_defeated
+	}
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		_show_message("Impossible d'écrire la sauvegarde.")
+		return false
+	file.store_string(JSON.stringify(data))
+	file.close()
+	_show_message("Partie sauvegardée. (F9 pour charger)")
+	return true
+
+func _load_game() -> bool:
+	if battle_active or inventory_open:
+		_show_message("Chargement indisponible pendant un menu ou un combat.")
+		return false
+	if not FileAccess.file_exists(SAVE_PATH):
+		_show_message("Aucune sauvegarde trouvée.")
+		return false
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		_show_message("Impossible de lire la sauvegarde.")
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	file.close()
+	if not parsed is Dictionary or parsed.get("version") != SAVE_VERSION or parsed.get("map") != String(map_id):
+		_show_message("Sauvegarde invalide ou incompatible.")
+		return false
+	var data: Dictionary = parsed
+	var position: Variant = data.get("player_position")
+	var saved_items: Variant = data.get("inventory")
+	if not position is Array or position.size() != 2 or not saved_items is Dictionary:
+		_show_message("Sauvegarde invalide.")
+		return false
+	for value in position:
+		if not (value is int or value is float):
+			_show_message("Sauvegarde invalide.")
+			return false
+	for key in ["hp", "mp", "experience", "gold"]:
+		if not data.get(key) is int:
+			_show_message("Sauvegarde invalide.")
+			return false
+	for flag in ["has_crystal", "chest_opened", "door_opened", "slime_defeated"]:
+		if not data.get(flag) is bool:
+			_show_message("Sauvegarde invalide.")
+			return false
+	for item_id in saved_items:
+		if not item_id in ["potion", "old_key"] or not saved_items[item_id] is int or saved_items[item_id] < 0:
+			_show_message("Sauvegarde invalide.")
+			return false
+	if data.hp < 1 or data.hp > 5 or data.mp < 0 or data.mp > 3 or data.experience < 0 or data.gold < 0:
+		_show_message("Sauvegarde invalide.")
+		return false
+	if saved_items.get("potion", 0) > 9 or saved_items.get("old_key", 0) > 1:
+		_show_message("Sauvegarde invalide.")
+		return false
+
+	player.position = Vector2(float(position[0]), float(position[1]))
+	player_hp = data.hp
+	player_mp = data.mp
+	experience = data.experience
+	gold = data.gold
+	has_crystal = data.has_crystal
+	chest_opened = data.chest_opened
+	door_opened = data.door_opened
+	slime_defeated = data.slime_defeated
+	for item_id in inventory.item_ids():
+		inventory.remove_item(item_id, inventory.count(item_id))
+	for item_id in saved_items:
+		inventory.add_item(StringName(item_id), saved_items[item_id])
+	if has_crystal and is_instance_valid(crystal):
+		crystal.queue_free()
+	if chest_opened and is_instance_valid(chest):
+		chest.queue_free()
+	if door_opened and is_instance_valid(door):
+		door.queue_free()
+	if slime_defeated and is_instance_valid(slime):
+		slime.queue_free()
+	slime_hp = 0 if slime_defeated else 3
+	player.set_input_enabled(true)
+	_update_battle_hud()
+	_update_inventory_menu()
+	status_label.text = _objective_text()
+	_show_message("Partie chargée.")
+	return true
 
 func _talk_to_npc() -> void:
 	var dialogue := RPGDialogue.new()

@@ -78,6 +78,25 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
+
+	# Save and restore the complete Valbrume quest state.
+	var saved_position: Vector2 = demo.get("player").position
+	assert(demo._save_game(), "Demo progress must save")
+	demo.set("gold", 0)
+	demo.set("experience", 0)
+	demo.set("has_crystal", false)
+	demo.set("chest_opened", false)
+	demo.set("door_opened", false)
+	demo.set("slime_defeated", false)
+	demo.get("player").position = Vector2.ZERO
+	demo.get("inventory").add_item(&"potion", 1)
+	assert(demo._load_game(), "A valid save must load")
+	assert(demo.get("player").position == saved_position, "Loading must restore player position")
+	assert(demo.get("gold") == 45 and demo.get("experience") == 20, "Loading must restore currency and experience")
+	assert(demo.get("has_crystal") and demo.get("chest_opened") and demo.get("door_opened") and demo.get("slime_defeated"), "Loading must restore quest flags")
+	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Loading must restore inventory quantities")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
+
 	print("Demo tests passed: animated hero, quest, locked door, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()

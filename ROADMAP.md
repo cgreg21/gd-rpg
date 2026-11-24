@@ -120,11 +120,13 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add a locked sanctuary door that consumes the key and grants a one-time reward.
 
 ### P2.3 — Save and load
-- [ ] Define a versioned save-data format.
-- [ ] Save party, inventory, switches, variables, current map and spawn point.
+
+**Progress:** Valbrume can save and restore its player position, HP/MP, EXP, gold, inventory and quest flags through a versioned JSON file in `user://`. F5 saves and F9 loads during exploration; malformed, incompatible and out-of-range data is rejected. Multiple slots, metadata and reusable party/world-state persistence remain planned.
+- [x] Define a versioned JSON save-data format for the Valbrume demo.
+- [~] Save the Valbrume player position, stats, inventory and quest flags; party, switches, variables and map transitions remain planned.
 - [ ] Add multiple save slots and basic save metadata.
 - [ ] Handle missing or outdated resource references safely.
-- [ ] Add save/load tests and a demo save point.
+- [x] Add headless save/load coverage and F5/F9 exploration controls.
 
 **Acceptance:** a player can save during exploration, restart the game, load, and continue with the same party, inventory and quest state.
 
