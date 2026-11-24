@@ -79,6 +79,8 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
 
+	# Complete the crystal objective before checking save restoration.
+	demo._collect_crystal()
 	# Save and restore the complete Valbrume quest state.
 	var saved_position: Vector2 = demo.get("player").position
 	assert(demo._save_game(), "Demo progress must save")
