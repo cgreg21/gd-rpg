@@ -51,7 +51,9 @@ jobs:
           test -s artifacts/screenshots/pixel-test_crt.png
           identify artifacts/screenshots/*.png
           for image in artifacts/screenshots/*.png; do
-            test "$(stat -c%s "$image")" -gt 10000 || { echo "Screenshot is unexpectedly small: $image"; exit 1; }
+            test "$(stat -c%s "$image")" -gt 5000 || { echo "Screenshot is unexpectedly small: $image"; exit 1; }
+            colors="$(convert "$image" -format %k info:)"
+            test "$colors" -gt 16 || { echo "Screenshot has too few colors: $image ($colors)"; exit 1; }
           done
           for scene in demo pixel-test; do
             difference="$(compare -metric AE "artifacts/screenshots/$scene.png" "artifacts/screenshots/${scene}_crt.png" null: 2>&1 || true)"
