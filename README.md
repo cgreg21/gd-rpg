@@ -16,7 +16,7 @@ A modular 2D JRPG engine for Godot 4, inspired by the exploration, party-driven 
 ## Run
 Open this repository in Godot and run the project (F6/F5). The main demo is asset-free.
 
-The project renders at a virtual resolution of **320×180**. The viewport uses integer scaling and nearest-neighbor filtering to preserve pixel edges. The demo supports **F3** to toggle the optional CRT overlay. A dedicated pixel-grid test scene is available at `examples/pixel_test/pixel_test.tscn`.
+The project renders at a virtual resolution of **320×180** and opens in a **1920×1080 (Full HD, 16:9)** window. This is an exact **6× integer scale**; nearest-neighbor filtering preserves crisp pixel edges. The logical resolution stays at 320×180, so gameplay and pixel-art assets do not need to be authored at 1080p. The demo supports **F3** to toggle the optional CRT overlay. A dedicated pixel-grid test scene is available at `examples/pixel_test/pixel_test.tscn`.
 
 The initial CRT shader adds scanlines, a subtle vertical grille and vignette. It is an overlay, not a full framebuffer distortion pass; curvature, bloom and chromatic aberration are not implemented yet.
 
