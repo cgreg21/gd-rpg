@@ -13,6 +13,7 @@ uniform float vignette_strength : hint_range(0.0, 1.0) = 0.28;
 uniform float chromatic_aberration : hint_range(0.0, 0.02) = 0.0015;
 uniform float bloom_strength : hint_range(0.0, 1.0) = 0.08;
 uniform float corner_roundness : hint_range(0.0, 1.0) = 0.35;
+uniform float corner_roundness : hint_range(0.0, 1.0) = 0.35;
 
 const float SCREEN_INSET = 0.055;
 
@@ -26,7 +27,7 @@ vec2 curve_uv(vec2 uv) {
 
 float rounded_screen_mask(vec2 uv) {
 	vec2 centered = abs(uv * 2.0 - 1.0);
-	float radius = 0.075;
+	float radius = mix(0.025, 0.12, corner_roundness);
 	vec2 corner = centered - vec2(1.0 - radius);
 	float distance_to_corner = length(max(corner, vec2(0.0))) + min(max(corner.x, corner.y), 0.0) - radius;
 	return 1.0 - smoothstep(0.0, 0.012, distance_to_corner);
