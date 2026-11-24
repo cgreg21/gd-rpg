@@ -126,7 +126,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Save the active map, player position, HP/MP, EXP, gold, inventory and quest flags across the connected demo maps.
 - [x] Add three binary save slots with map, timestamp and play-time metadata.
 - [x] Add an in-game save-slot browser with three slots, map/date/play-time metadata and overwrite confirmation.
-- [ ] Handle missing or outdated resource references safely.
+- [x] Reject malformed, non-finite and outdated binary save data before exposing metadata or restoring state.
 - [x] Add headless save/load coverage, including restoring world objects from an earlier save, and F5/F9 controls on all demo maps.
 
 **Acceptance:** a player can save during exploration, restart the game, load, and continue with the same party, inventory and quest state.

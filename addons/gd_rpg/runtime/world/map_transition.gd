@@ -49,6 +49,10 @@ func save_game(map_id: StringName, scene_path: String, position: Vector2, slot: 
 		return false
 	if not MAP_SCENES.has(String(map_id)) or MAP_SCENES[String(map_id)] != scene_path:
 		return false
+	if not position.is_finite() or not is_finite(play_time_seconds) or play_time_seconds < 0.0:
+		return false
+	if not _is_valid_transfer(transfer_data):
+		return false
 	var directory_error := DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(SAVE_DIRECTORY))
 	if directory_error != OK and directory_error != ERR_ALREADY_EXISTS:
 		return false
@@ -75,19 +79,9 @@ func load_game(current_map_id: StringName, slot: int = 1) -> bool:
 	var data := _read_save(slot)
 	if data.is_empty():
 		return false
-	var saved_map := String(data.get("map", ""))
-	var scene_path := String(data.get("scene", ""))
-	var position: Variant = data.get("position")
-	var saved_transfer: Variant = data.get("transfer")
-	if not MAP_SCENES.has(saved_map) or MAP_SCENES[saved_map] != scene_path:
-		return false
-	if not position is Array or position.size() != 2 or not saved_transfer is Dictionary:
-		return false
-	for coordinate in position:
-		if not (coordinate is int or coordinate is float) or not is_finite(float(coordinate)):
-			return false
-	if not _is_valid_transfer(saved_transfer):
-		return false
+	var saved_map := String(data.map)
+	var position: Array = data.position
+	var saved_transfer: Dictionary = data.transfer
 	transfer_data = saved_transfer.duplicate(true)
 	play_time_seconds = maxf(0.0, float(data.get("play_time", 0.0)))
 	pending_load = {"map": saved_map, "position": Vector2(float(position[0]), float(position[1]))}
@@ -121,11 +115,7 @@ func _read_save(slot: int) -> Dictionary:
 	var parsed: Variant = file.get_var(false)
 	var read_error := file.get_error()
 	file.close()
-	if read_error != OK or not parsed is Dictionary:
-		return {}
-	if parsed.get("slot") != slot or not parsed.get("saved_at") is int:
-		return {}
-	if not (parsed.get("play_time") is int or parsed.get("play_time") is float):
+	if read_error != OK or not parsed is Dictionary or not _is_valid_save_data(parsed, slot):
 		return {}
 	return parsed
 
