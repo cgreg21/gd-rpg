@@ -25,5 +25,7 @@ jobs:
         run: godot --headless --path . --script res://tests/test_display.gd
       - name: Run playable demo tests
         run: godot --headless --path . --script res://tests/test_demo.gd
+      - name: Run ATB system tests
+        run: godot --headless --path . --script res://tests/test_atb.gd
       - name: Run project smoke test
         run: godot --headless --path . --quit-after 5
