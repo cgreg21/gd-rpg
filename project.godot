@@ -5,8 +5,8 @@ run/main_scene="res://examples/demo/demo.tscn"
 [display]
 window/size/viewport_width=320
 window/size/viewport_height=180
-window/size/window_width_override=960
-window/size/window_height_override=540
+window/size/window_width_override=1920
+window/size/window_height_override=1080
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
 
