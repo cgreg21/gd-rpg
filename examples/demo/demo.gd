@@ -8,6 +8,7 @@ const SLIME_POSITION := Vector2(190, 145)
 const CRYSTAL_POSITION := Vector2(520, 270)
 const CHEST_POSITION := Vector2(570, 235)
 const DOOR_POSITION := Vector2(570, 175)
+const ROUTE_PORTAL_POSITION := Vector2(82, 278)
 const SAVE_PATH := "user://valbrume_save.json"
 const SAVE_VERSION := 1
 
@@ -25,6 +26,7 @@ var chest: Node2D
 var chest_opened := false
 var door: Node2D
 var door_opened := false
+var route_portal: Node2D
 var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
@@ -106,6 +108,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var distance_slime := player.global_position.distance_to(SLIME_POSITION)
 	var distance_chest := player.global_position.distance_to(CHEST_POSITION)
 	var distance_door := player.global_position.distance_to(DOOR_POSITION)
+	var distance_portal := player.global_position.distance_to(ROUTE_PORTAL_POSITION)
 	if distance_npc < 42.0:
 		_talk_to_npc()
 	elif distance_crystal < 30.0 and not has_crystal:
@@ -116,6 +119,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_open_chest()
 	elif distance_door < 40.0 and not door_opened:
 		_open_door()
+	elif distance_portal < 38.0:
+		player.set_input_enabled(false)
+		RPGMapRouter.transition_to("res://examples/demo/route.tscn", &"village_gate")
 	else:
 		_show_message("Il n'y a rien à faire ici.")
 
@@ -127,6 +133,10 @@ func _build_world() -> void:
 	spawn.name = "default"
 	spawn.position = PLAYER_START
 	spawn_points.add_child(spawn)
+	var route_spawn := Marker2D.new()
+	route_spawn.name = "village_return"
+	route_spawn.position = Vector2(90, 278)
+	spawn_points.add_child(route_spawn)
 
 	var ground := ColorRect.new()
 	ground.size = WORLD_SIZE
@@ -152,6 +162,8 @@ func _build_world() -> void:
 	_draw_rect(Vector2(36, 125), Vector2(5, 220), "#59a9c5", -3)
 
 	_build_house(Vector2(350, 55))
+	route_portal = _create_route_portal()
+	add_child(route_portal)
 	_build_tree(Vector2(105, 195))
 	_build_tree(Vector2(560, 110))
 	_build_tree(Vector2(90, 315))
@@ -212,6 +224,14 @@ func _build_characters() -> void:
 	add_child(chest)
 	door = _create_door()
 	add_child(door)
+
+func _create_route_portal() -> Node2D:
+	var node := Node2D.new()
+	node.name = "RoutePortal"
+	node.position = ROUTE_PORTAL_POSITION
+	_draw_diamond(node, Color("#8be6c5"))
+	_add_name_tag(node, "Chemin")
+	return node
 
 func _create_crystal() -> Node2D:
 	var node := Node2D.new()
@@ -646,7 +666,7 @@ func _draw_battle_overlay(show: bool) -> void:
 func _update_prompt() -> void:
 	var nearest := 999.0
 	var prompt := ""
-	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"], [DOOR_POSITION, "E : Déverrouiller"]]:
+	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"], [DOOR_POSITION, "E : Déverrouiller"], [ROUTE_PORTAL_POSITION, "E : Explorer le chemin"]]:
 		var distance: float = player.global_position.distance_to(candidate[0])
 		if distance < nearest:
 			nearest = distance

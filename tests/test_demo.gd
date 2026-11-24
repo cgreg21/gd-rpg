@@ -20,6 +20,19 @@ func _initialize() -> void:
 	assert(demo.get("chest") != null, "Demo must create its treasure chest")
 	assert(demo.get("door") != null, "Demo must create its locked sanctuary door")
 	assert(demo.get("slime") != null, "Demo must create its encounter")
+	assert(demo.get("route_portal") != null, "Village must provide an exit to the connected route")
+	assert(demo.has_spawn_point(&"village_return"), "Village must expose a return spawn")
+	var route_scene := load("res://examples/demo/route.tscn") as PackedScene
+	assert(route_scene != null, "Connected route scene must exist")
+	var route := route_scene.instantiate()
+	root.add_child(route)
+	await process_frame
+	assert(route is RPGMap and route.map_id == &"valbrume_route", "Route must be a reusable RPGMap")
+	assert(route.has_spawn_point(&"village_gate"), "Route must expose its village entry spawn")
+	assert(route.has_spawn_point(&"default"), "Route must expose a default spawn")
+	assert(route.get("return_portal") != null, "Route must provide a portal back to the village")
+	route.queue_free()
+	await process_frame
 	assert(demo.get("dialogue_runner") is RPGDialogueRunner, "Demo must use the dialogue runner")
 	assert(demo.get("inventory") is RPGInventory, "Demo must use the reusable inventory")
 	assert(demo.get("inventory").count(&"potion") == 1, "Demo must start with one potion")
@@ -109,6 +122,6 @@ func _initialize() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
 
 	test_finished = true
-	print("Demo tests passed: animated hero, quest, locked door, treasure, inventory and battle commands.")
+	print("Demo tests passed: connected maps, animated hero, quest, locked door, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()

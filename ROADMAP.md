@@ -74,18 +74,18 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
 - [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Progress:** the project now runs at 640×360 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. `RPGMapRouter` now switches map scenes inside the existing display SubViewport, applies a fade transition and forwards named entry spawns. Its Valbrume slice now includes an original animated hero, NPC dialogue, a collectible objective and a simple enemy encounter. The CRT overlay is a borderless 1080p screen-texture pass: it samples the already-upscaled framebuffer, applies barrel curvature, alternating source-aligned scanlines, an RGB phosphor grille, vignette, chromatic aberration and a restrained glow. All parameters are exposed on `RPGCRTOverlay`; clean, subtle and strong presets are available. Automated screenshot captures verify that the enabled pass changes the final image; the current 1920×1080 clean/CRT captures are published in `docs/screenshots/`. Physical-display readability and performance checks remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
+**Progress:** the project now runs at 640×360 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with named default and return spawns. The village now connects to a forest route in both directions through the fade router. `RPGMapRouter` now switches map scenes inside the existing display SubViewport, applies a fade transition and forwards named entry spawns. Its Valbrume slice now includes an original animated hero, NPC dialogue, a collectible objective and a simple enemy encounter. The CRT overlay is a borderless 1080p screen-texture pass: it samples the already-upscaled framebuffer, applies barrel curvature, alternating source-aligned scanlines, an RGB phosphor grille, vignette, chromatic aberration and a restrained glow. All parameters are exposed on `RPGCRTOverlay`; clean, subtle and strong presets are available. Automated screenshot captures verify that the enabled pass changes the final image; the current 1920×1080 clean/CRT captures are published in `docs/screenshots/`. Physical-display readability and performance checks remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
 - [x] Add an `RPGMap` base with named `Marker2D` spawn points and default-spawn fallback.
 - [x] Add a named default spawn marker to the demo map.
 - [x] Create the Valbrume demo slice with an original four-direction pixel-art hero, village scenery, NPC quest, collectible crystal and turn-based slime encounter.
-- [~] Add map-to-map transitions with fade in/out (router, display-preserving scene replacement and named entry spawns are implemented; demo portals and connected maps remain).
+- [~] Add map-to-map transitions with fade in/out (village and forest route are connected with two-way portals and named spawns; third map and state transfer remain).
 - [ ] Preserve party and world state when changing maps.
 - [ ] Add camera follow, limits and optional room framing.
 - [ ] Add collision layers/masks conventions and example collision tiles.
-- [ ] Add a small connected sample area (village, route and interior).
+- [~] Add a small connected sample area (village and forest route are playable; interior remains).
 
 **Acceptance:** the player can walk between at least three maps, arrive at the correct spawn point, collide with obstacles, and retain world state.
 

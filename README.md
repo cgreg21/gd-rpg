@@ -54,7 +54,7 @@ The reusable inventory uses `RPGItemData` Resources and an `RPGInventory` node f
 Unlock the sanctuary after opening the chest to complete the extended village objective. Valbrume supports a versioned JSON save in `user://valbrume_save.json`; F5 saves and F9 restores the player position, stats, inventory and quest progress, including the presence of world objects when returning to an earlier save. Invalid, incompatible and out-of-range save data is rejected. Saves are restricted to exploration, outside menus and battles. The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
 
 - **Move:** arrow keys
-- **Inventory:** I (close with I or Échap)\n- **Treasure chest:** E near the chest
+- **Inventory:** I (close with I or Échap)\n- **Explore the route:** E at the green portal near the lower-left path\n- **Treasure chest:** E near the chest
 - **Interact / collect:** E
 - **Battle commands:** 1 Attack, 2 Azure Spark, 3 Potion, 4 Defend (E/Enter also attacks)
 - **Advance dialogue:** Enter
@@ -67,9 +67,9 @@ Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime
 - Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).
 - Use `get_spawn_position(&"spawn_name")` to resolve a named entry point; unknown names fall back to the map's `default_spawn`.
 - Use `RPGPixelCamera` as a `Camera2D` child of the player. It offsets the camera view to whole virtual pixels without mutating the camera's world transform, avoiding subpixel camera movement.
-- The demo is itself an `RPGMap`, uses a named default spawn, and demonstrates the pixel camera.
+- The demo is itself an `RPGMap`, uses named default and return spawns, and demonstrates the pixel camera. The exit near the lower-left path leads to `route.tscn`; the route portal returns to the village.
 
-`RPGMapRouter` is an autoload that replaces the map inside `RPGDisplayRoot` (so the 640×360 viewport and CRT presentation stay active), fades to black, and passes a named entry spawn to the next `RPGMap`. Call `RPGMapRouter.transition_to("res://path/to/map.tscn", &"entry")`; add named `Marker2D` children under `SpawnPoints`. Missing spawn names fall back to the map default. Party/world-state transfer and camera limits remain planned.
+`RPGMapRouter` is an autoload that replaces the map inside `RPGDisplayRoot` (so the 640×360 viewport and CRT presentation stay active), fades to black, and passes a named entry spawn to the next `RPGMap`. Call `RPGMapRouter.transition_to("res://path/to/map.tscn", &"entry")`; add named `Marker2D` children under `SpawnPoints`. Missing spawn names fall back to the map default. The Valbrume village now connects to a playable forest route with a return portal; both use named entry points and retain the same display pipeline. Shared party/world-state transfer and camera limits remain planned.
 
 ## Layout
 - `addons/gd_rpg/runtime`: reusable runtime systems, including display, character, dialogue, interaction and world foundations
