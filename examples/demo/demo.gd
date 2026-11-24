@@ -13,16 +13,16 @@ func _ready() -> void:
 func _build_demo() -> void:
 	var background := ColorRect.new()
 	background.color = Color("#263b35")
-	background.size = Vector2(320, 180)
+	background.size = Vector2(640, 360)
 	background.z_index = -10
 	add_child(background)
 
-	for x in range(0, 320, 16):
-		for y in range(0, 180, 16):
+	for x in range(0, 640, 32):
+		for y in range(0, 360, 32):
 			var tile := ColorRect.new()
-			tile.position = Vector2(x + 1, y + 1)
-			tile.size = Vector2(14, 14)
-			tile.color = Color("#304b3d") if (x / 16 + y / 16) % 2 == 0 else Color("#2b4438")
+			tile.position = Vector2(x + 2, y + 2)
+			tile.size = Vector2(28, 28)
+			tile.color = Color("#304b3d") if (x / 32 + y / 32) % 2 == 0 else Color("#2b4438")
 			add_child(tile)
 
 	var spawn_points := Node2D.new()
@@ -30,11 +30,11 @@ func _build_demo() -> void:
 	add_child(spawn_points)
 	var default_spawn := Marker2D.new()
 	default_spawn.name = "default"
-	default_spawn.position = Vector2(160, 102)
+	default_spawn.position = Vector2(320, 204)
 	spawn_points.add_child(default_spawn)
 
 	player = RPGCharacter.new()
-	player.move_speed = 50.0
+	player.move_speed = 100.0
 	player.position = get_spawn_position()
 	add_child(player)
 
@@ -43,27 +43,28 @@ func _build_demo() -> void:
 	player.add_child(camera)
 
 	var visual := Polygon2D.new()
-	visual.polygon = PackedVector2Array([Vector2(0, -6), Vector2(5, -2), Vector2(4, 6), Vector2(-4, 6), Vector2(-5, -2)])
+	visual.polygon = PackedVector2Array([Vector2(0, -12), Vector2(10, -4), Vector2(8, 12), Vector2(-8, 12), Vector2(-10, -4)])
 	visual.color = Color("#f2c078")
 	player.add_child(visual)
 
 	var npc := Polygon2D.new()
 	npc.polygon = visual.polygon
 	npc.color = Color("#8eb8e8")
-	npc.position = Vector2(160, 70)
+	npc.position = Vector2(320, 140)
 	add_child(npc)
 
 	var ui := CanvasLayer.new()
 	add_child(ui)
 	var info_label := Label.new()
-	info_label.position = Vector2(6, 4)
+	info_label.position = Vector2(12, 8)
 	info_label.text = "GD RPG  |  Arrows: move  |  E: talk  |  F3: CRT"
+	info_label.add_theme_font_size_override("font_size", 16)
 	ui.add_child(info_label)
 	dialogue_label = Label.new()
-	dialogue_label.position = Vector2(6, 148)
-	dialogue_label.size = Vector2(308, 28)
+	dialogue_label.position = Vector2(12, 296)
+	dialogue_label.size = Vector2(616, 56)
 	dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dialogue_label.add_theme_font_size_override("font_size", 8)
+	dialogue_label.add_theme_font_size_override("font_size", 16)
 	dialogue_label.add_theme_color_override("font_color", Color.WHITE)
 	ui.add_child(dialogue_label)
 
@@ -91,7 +92,7 @@ func _start_intro() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
 		crt_overlay.enabled = not crt_overlay.enabled
-	if event.is_action_pressed("interact") and player != null and player.position.distance_to(Vector2(160, 70)) < 50.0:
+	if event.is_action_pressed("interact") and player != null and player.position.distance_to(Vector2(320, 140)) < 100.0:
 		var dialogue := RPGDialogue.new()
 		dialogue.dialogue_id = &"traveller"
 		dialogue.lines = ["The road ahead leads to a forgotten kingdom.", "The ATB battle system is the next step in our journey."]
