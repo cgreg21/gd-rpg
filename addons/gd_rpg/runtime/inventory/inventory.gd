@@ -17,6 +17,13 @@ func get_item(item_id: StringName) -> RPGItemData:
 func count(item_id: StringName) -> int:
 	return _quantities.get(item_id, 0)
 
+func item_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for item_id in _quantities:
+		ids.append(item_id)
+	ids.sort()
+	return ids
+
 func add_item(item_id: StringName, amount: int = 1) -> int:
 	if amount <= 0 or not _definitions.has(item_id):
 		return 0

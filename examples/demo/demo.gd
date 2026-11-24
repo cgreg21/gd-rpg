@@ -6,6 +6,7 @@ const PLAYER_START := Vector2(300, 210)
 const NPC_POSITION := Vector2(430, 150)
 const SLIME_POSITION := Vector2(190, 145)
 const CRYSTAL_POSITION := Vector2(520, 270)
+const CHEST_POSITION := Vector2(570, 235)
 
 var player: RPGCharacter
 var hero_animation: AnimatedSprite2D
@@ -17,6 +18,8 @@ var prompt_label: Label
 var npc: Node2D
 var slime: Node2D
 var crystal: Node2D
+var chest: Node2D
+var chest_opened := false
 var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
@@ -83,17 +86,20 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_4:
 					_battle_action("defend")
 		return
-	if inventory_open or not event.is_action_pressed("interact"):
+	if not event.is_action_pressed("interact"):
 		return
 	var distance_npc := player.global_position.distance_to(NPC_POSITION)
 	var distance_crystal := player.global_position.distance_to(CRYSTAL_POSITION)
 	var distance_slime := player.global_position.distance_to(SLIME_POSITION)
+	var distance_chest := player.global_position.distance_to(CHEST_POSITION)
 	if distance_npc < 42.0:
 		_talk_to_npc()
 	elif distance_crystal < 30.0 and not has_crystal:
 		_collect_crystal()
 	elif distance_slime < 42.0 and not slime_defeated:
 		_start_battle()
+	elif distance_chest < 38.0 and not chest_opened:
+		_open_chest()
 	else:
 		_show_message("Il n'y a rien à faire ici.")
 
@@ -194,6 +200,12 @@ func _build_characters() -> void:
 	_draw_slime(slime)
 	_add_name_tag(slime, "Slime")
 
+	chest = Node2D.new()
+	chest.position = CHEST_POSITION
+	add_child(chest)
+	_draw_chest(chest)
+	_add_name_tag(chest, "Coffre")
+
 func _build_inventory() -> void:
 	inventory = RPGInventory.new()
 	inventory.name = "Inventory"
@@ -206,6 +218,13 @@ func _build_inventory() -> void:
 	potion.hp_restore = 3
 	inventory.register_item(potion)
 	inventory.add_item(potion.item_id)
+
+	var key := RPGItemData.new()
+	key.item_id = &"old_key"
+	key.display_name = "Vieille clé"
+	key.description = "Une clé rouillée trouvée dans un coffre."
+	key.max_stack = 1
+	inventory.register_item(key)
 
 func _build_hud() -> void:
 	var ui := CanvasLayer.new()
@@ -286,15 +305,16 @@ func _toggle_inventory() -> void:
 func _update_inventory_menu() -> void:
 	if inventory_label == null:
 		return
-	var potion := inventory.get_item(&"potion")
-	if potion == null:
-		inventory_label.text = "INVENTAIRE\\n\\nAucun objet enregistré.\\n\\nI / Échap : fermer"
-		return
-	inventory_label.text = "INVENTAIRE\\n\\n%s  x%d\\n%s\\n\\nI / Échap : fermer" % [
-		potion.display_name,
-		inventory.count(&"potion"),
-		potion.description
-	]
+	var lines := ["INVENTAIRE", ""]
+	for item_id in inventory.item_ids():
+		var item := inventory.get_item(item_id)
+		lines.append("%s  x%d" % [item.display_name, inventory.count(item_id)])
+		lines.append(item.description)
+		lines.append("")
+	if lines.size() == 2:
+		lines.append("Aucun objet.")
+	lines.append("I / Échap : fermer")
+	inventory_label.text = "\\n".join(lines)
 
 func _talk_to_npc() -> void:
 	var dialogue := RPGDialogue.new()
@@ -332,19 +352,8 @@ func _battle_action(action: String) -> void:
 			player_mp -= 2
 			damage = 2
 		"item":
-			var potion := inventory.get_item(&"potion")
-			if inventory.count(&"potion") == 0 or potion == null:
-				_show_message("Tu n'as plus de potion.")
-				return
-			if player_hp == 5:
-				_show_message("Tes PV sont déjà au maximum.")
-				return
-			inventory.remove_item(&"potion")
-			player_hp = mini(5, player_hp + potion.hp_restore)
-			defending = false
-			_update_battle_hud()
-			_show_message("Potion utilisée : %d PV récupérés." % potion.hp_restore)
-			_enemy_turn()
+			if _use_potion():
+				_enemy_turn()
 			return
 		"defend":
 			defending = true
@@ -359,6 +368,33 @@ func _battle_action(action: String) -> void:
 		return
 	_show_message("Tu infliges %d dégâts au slime." % damage)
 	_enemy_turn()
+
+func _use_potion() -> bool:
+	var potion := inventory.get_item(&"potion")
+	if potion == null or not inventory.remove_item(&"potion"):
+		_show_message("Tu n'as plus de potion.")
+		return false
+	if player_hp == 5:
+		inventory.add_item(&"potion")
+		_show_message("Tes PV sont déjà au maximum.")
+		return false
+	player_hp = mini(5, player_hp + potion.hp_restore)
+	defending = false
+	_update_battle_hud()
+	_update_inventory_menu()
+	_show_message("Potion utilisée : %d PV récupérés." % potion.hp_restore)
+	return true
+
+func _open_chest() -> void:
+	if chest_opened:
+		return
+	chest_opened = true
+	gold += 10
+	inventory.add_item(&"old_key")
+	chest.queue_free()
+	_update_battle_hud()
+	_update_inventory_menu()
+	_show_message("Coffre ouvert ! +10 G et une vieille clé.")
 
 func _enemy_turn() -> void:
 	if not battle_active:
@@ -431,7 +467,7 @@ func _draw_battle_overlay(show: bool) -> void:
 func _update_prompt() -> void:
 	var nearest := 999.0
 	var prompt := ""
-	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"]]:
+	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"]]:
 		var distance: float = player.global_position.distance_to(candidate[0])
 		if distance < nearest:
 			nearest = distance
@@ -518,6 +554,23 @@ func _draw_diamond(parent: Node2D, color: Color) -> void:
 	shine.polygon = PackedVector2Array([Vector2(0, -8), Vector2(4, -3), Vector2(0, 1)])
 	shine.color = Color("#e6ffff")
 	parent.add_child(shine)
+
+func _draw_chest(parent: Node2D) -> void:
+	var body := ColorRect.new()
+	body.position = Vector2(-12, -8)
+	body.size = Vector2(24, 17)
+	body.color = Color("#805337")
+	parent.add_child(body)
+	var lid := ColorRect.new()
+	lid.position = Vector2(-13, -11)
+	lid.size = Vector2(26, 6)
+	lid.color = Color("#c18a4d")
+	parent.add_child(lid)
+	var lock := ColorRect.new()
+	lock.position = Vector2(-2, -4)
+	lock.size = Vector2(4, 7)
+	lock.color = Color("#e7c879")
+	parent.add_child(lock)
 
 func _draw_slime(parent: Node2D) -> void:
 	var blob := Polygon2D.new()

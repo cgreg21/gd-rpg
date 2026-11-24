@@ -11,10 +11,12 @@ func _initialize() -> void:
 	assert(demo.get("hero_animation") is AnimatedSprite2D, "Hero must use an animated pixel-art sprite")
 	assert(demo.get("npc") != null, "Demo must create its quest NPC")
 	assert(demo.get("crystal") != null, "Demo must create its collectible")
+	assert(demo.get("chest") != null, "Demo must create its treasure chest")
 	assert(demo.get("slime") != null, "Demo must create its encounter")
 	assert(demo.get("dialogue_runner") is RPGDialogueRunner, "Demo must use the dialogue runner")
 	assert(demo.get("inventory") is RPGInventory, "Demo must use the reusable inventory")
 	assert(demo.get("inventory").count(&"potion") == 1, "Demo must start with one potion")
+	assert(demo.get("inventory").count(&"old_key") == 0, "Quest key must start outside the inventory")
 	assert(demo.get("inventory_panel") is PanelContainer, "Demo must create an inventory panel")
 	assert(not demo.get("inventory_panel").visible, "Inventory menu must start closed")
 	demo._toggle_inventory()
@@ -24,6 +26,17 @@ func _initialize() -> void:
 	demo._toggle_inventory()
 	assert(not demo.get("inventory_panel").visible, "Inventory menu must close")
 	assert(demo.get("player").input_enabled, "Closing inventory must restore player movement")
+
+	demo._open_chest()
+	assert(demo.get("chest_opened"), "Chest must open")
+	assert(demo.get("gold") == 10, "Chest must award ten gold")
+	assert(demo.get("inventory").count(&"old_key") == 1, "Chest must add one quest key")
+	assert(not is_instance_valid(demo.get("chest")), "Opened chest must be removed")
+	demo._open_chest()
+	assert(demo.get("gold") == 10 and demo.get("inventory").count(&"old_key") == 1, "Chest rewards must only be granted once")
+	demo._toggle_inventory()
+	assert(demo.get("inventory_label").text.contains("Vieille clé"), "Inventory menu must list quest items")
+	demo._toggle_inventory()
 
 	var animation := demo.get("hero_animation") as AnimatedSprite2D
 	for direction in ["front", "back", "left", "right"]:
@@ -52,6 +65,6 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
-	print("Demo tests passed: animated hero, quest, inventory menu, battle commands, skills, items and defense.")
+	print("Demo tests passed: animated hero, quest, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()
