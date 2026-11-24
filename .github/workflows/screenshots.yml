@@ -1,0 +1,51 @@
+name: Visual screenshots
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.4.1
+          use-dotnet: false
+          include-templates: false
+
+      - name: Install screenshot tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes xvfb imagemagick xdotool
+
+      - name: Capture 1080p scenes
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
+            bash scripts/capture-screenshots.sh artifacts/screenshots
+
+      - name: Validate screenshot files
+        run: |
+          test -s artifacts/screenshots/demo.png
+          test -s artifacts/screenshots/demo_crt.png
+          test -s artifacts/screenshots/pixel-test.png
+          test -s artifacts/screenshots/pixel-test_crt.png
+          identify artifacts/screenshots/*.png
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: gd-rpg-1080p-screenshots
+          path: artifacts/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 14
