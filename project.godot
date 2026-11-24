@@ -3,11 +3,12 @@ config/name="GD RPG Engine"
 run/main_scene="res://examples/demo/demo.tscn"
 
 [display]
-window/size/viewport_width=640
-window/size/viewport_height=360
-window/size/window_width_override=1280
-window/size/window_height_override=720
-window/stretch/mode="canvas_items"
+window/size/viewport_width=320
+window/size/viewport_height=180
+window/size/window_width_override=960
+window/size/window_height_override=540
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
 
 [input]
 interact={
@@ -18,6 +19,7 @@ interact={
 [rendering]
 renderer/rendering_method="gl_compatibility"
 textures/default_filters/use_nearest_mipmap_filter=false
+textures/canvas_textures/default_texture_filter=0
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gd_rpg/plugin.cfg")
