@@ -34,14 +34,13 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - [ ] Document recommended import settings for spritesheets, tilesets and fonts.
 
 ### CRT shader and display options
-- [ ] Add an optional full-screen CRT canvas shader, applied once at the final presentation stage.
-- [ ] Implement configurable scanlines and subtle phosphor/RGB grille mask.
-- [ ] Add restrained vignette and screen curvature controls.
-- [ ] Add optional, subtle bloom and chromatic aberration; keep both disabled or minimal by default.
-- [ ] Expose shader parameters through a small display settings resource or settings menu.
-- [ ] Provide clean, subtle CRT and stronger retro presets, plus a fully disabled mode.
-- [ ] Ensure the shader does not blur source pixels excessively or make text/UI hard to read.
-- [ ] Check shader performance at the target resolution and on integrated GPUs.
+- [x] Add an optional full-screen CRT canvas shader that samples the rendered framebuffer in one final presentation pass.
+- [x] Implement configurable scanlines and an RGB phosphor grille mask.
+- [x] Add barrel/screen curvature, rounded screen corners and vignette controls.
+- [x] Add restrained phosphor glow and chromatic aberration controls.
+- [x] Expose shader parameters directly on `RPGCRTOverlay` for inspector/runtime tuning.
+- [x] Provide clean, subtle CRT and stronger retro presets, plus a fully disabled mode.
+- [~] Verify pixel readability, shader performance and visual quality across physical displays and integrated GPUs.
 
 **Visual acceptance:** at integer scale, source pixels remain crisp and stable during movement; the CRT effect can be toggled without changing gameplay or breaking UI readability. The clean mode must look correct without any CRT shader.
 
@@ -73,7 +72,7 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
 - [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay remains toggleable at runtime. Scrolling-map camera verification, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
+**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay is now a real screen-texture pass: it warps the framebuffer with barrel curvature, clips rounded corners, and applies scanlines, an RGB phosphor grille, vignette, chromatic aberration and a restrained glow. All parameters are exposed on `RPGCRTOverlay`; clean, subtle and strong presets are available. Automated screenshot captures verify that the enabled pass changes the final image. Physical-display readability and performance checks remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
