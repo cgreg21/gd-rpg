@@ -80,6 +80,7 @@ func load_game(current_map_id: StringName, slot: int = 1) -> bool:
 	if data.is_empty():
 		return false
 	var saved_map := String(data.map)
+	var scene_path := String(data.scene)
 	var position: Array = data.position
 	var saved_transfer: Dictionary = data.transfer
 	transfer_data = saved_transfer.duplicate(true)
