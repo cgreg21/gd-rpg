@@ -20,6 +20,8 @@ The game renders into a dedicated **640×360 SubViewport**, which is enlarged wi
 
 ## Linux AppImage
 
+The latest Linux x86_64 AppImage is committed at [dist/GD-RPG-x86_64.AppImage](dist/GD-RPG-x86_64.AppImage). Download it from GitHub using **Download raw file**. The AppImage workflow rebuilds and updates this file after a successful smoke test.
+
 A Linux AppImage is built automatically by GitHub Actions on every push to `main`, on version tags (`v*`) and on manual runs. The artifact is named `gd-rpg-linux-appimage` and contains the exported game and its bundled runtime libraries.
 
 Download the artifact from the [Linux AppImage workflow](https://github.com/cgreg21/gd-rpg/actions/workflows/appimage.yml), extract the ZIP, then run:
