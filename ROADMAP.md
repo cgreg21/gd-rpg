@@ -21,9 +21,9 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 ## Visual direction — pixel-perfect 16-bit + CRT
 
 ### Pixel-perfect rendering rules
-- [ ] Set a configurable virtual resolution, initially 320×180, with a documented 16:9 presentation.
-- [ ] Scale the game viewport using integer scaling wherever possible; use letterboxing/pillarboxing rather than fractional pixel scaling.
-- [ ] Configure nearest-neighbor texture filtering for pixel-art assets.
+- [x] Set the virtual resolution to 320×180, with a documented 16:9 presentation.
+- [x] Configure viewport stretching with integer scaling; Godot uses letterboxing/pillarboxing rather than fractional pixel scaling.
+- [x] Set nearest-neighbor canvas texture filtering as the project default.
 - [ ] Keep sprite, tile and UI artwork aligned to the pixel grid.
 - [ ] Keep character and camera rendering pixel-aligned; avoid visible subpixel jitter while moving or following the player.
 - [ ] Define a consistent pixel-art scale for tiles, characters, portraits, effects and UI.
@@ -64,13 +64,13 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 ### P1.0 — Pixel-perfect rendering foundation
 - [ ] Implement the virtual resolution and integer viewport scaling rules above.
 - [ ] Configure nearest-neighbor filtering as the default for pixel-art content.
-- [ ] Add a reusable pixel-aligned camera setup.
-- [ ] Add a test scene with a moving character, scrolling tilemap and pixel-art UI to reveal jitter or filtering issues.
-- [ ] Add the optional CRT shader and clean/CRT display presets.
-- [ ] Add a display setting to enable/disable CRT and adjust effect strength.
-- [ ] Document the art/import guidelines and shader limitations.
+- [ ] Add a reusable pixel-aligned camera setup (verify against scrolling maps before marking complete).
+- [x] Add a pixel-grid test scene with a moving marker, tile grid and UI to reveal filtering issues.
+- [x] Add an optional CRT overlay shader with clean and CRT modes (scanlines, grille and vignette).
+- [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
+- [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Acceptance:** the test scene stays crisp at supported window sizes; CRT can be toggled at runtime, with no fractional scaling artifacts introduced by the engine's default presentation path.
+**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. The demo and pixel test scene expose the CRT overlay (scanlines, grille and vignette), toggleable at runtime. Camera pixel snapping, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI only validates import/runtime startup; it does not replace manual visual inspection.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
