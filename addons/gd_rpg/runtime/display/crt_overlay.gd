@@ -17,7 +17,7 @@ class_name RPGCRTOverlay
 		curvature_vertical = clampf(value, 0.0, 0.20)
 		_update_material()
 
-@export_range(0.0, 1.0, 0.01) var scanline_strength: float = 0.48:
+@export_range(0.0, 1.0, 0.01) var scanline_strength: float = 0.38:
 	set(value):
 		scanline_strength = clampf(value, 0.0, 1.0)
 		_update_material()
@@ -63,9 +63,9 @@ func set_preset(preset: StringName) -> void:
 		&"clean":
 			enabled = false
 		&"crt":
-			_apply_preset(0.075, 0.065, 0.42, 0.08, 0.22, 0.001, 0.04, 0.25)
+			_apply_preset(0.075, 0.065, 0.38, 0.08, 0.22, 0.001, 0.04, 0.25)
 		&"crt_strong":
-			_apply_preset(0.12, 0.10, 0.58, 0.14, 0.36, 0.0025, 0.12, 0.45)
+			_apply_preset(0.12, 0.10, 0.52, 0.14, 0.36, 0.0025, 0.12, 0.45)
 		_:
 			push_warning("Unknown CRT preset: %s" % preset)
 
