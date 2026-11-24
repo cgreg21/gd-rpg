@@ -24,6 +24,9 @@ var player_mp := 3
 var experience := 0
 var gold := 0
 var inventory: RPGInventory
+var inventory_panel: PanelContainer
+var inventory_label: Label
+var inventory_open := false
 var slime_hp := 3
 var battle_active := false
 var defending := false
@@ -61,6 +64,13 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if player == null:
 		return
+	if inventory_open:
+		if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_I, KEY_ESCAPE]:
+			_toggle_inventory()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_I and not battle_active:
+		_toggle_inventory()
+		return
 	if battle_active:
 		if event is InputEventKey and event.pressed and not event.echo:
 			match event.keycode:
@@ -73,7 +83,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				KEY_4:
 					_battle_action("defend")
 		return
-	if not event.is_action_pressed("interact"):
+	if inventory_open or not event.is_action_pressed("interact"):
 		return
 	var distance_npc := player.global_position.distance_to(NPC_POSITION)
 	var distance_crystal := player.global_position.distance_to(CRYSTAL_POSITION)
@@ -221,6 +231,8 @@ func _build_hud() -> void:
 	hp_label.add_theme_font_size_override("font_size", 15)
 	row.add_child(hp_label)
 
+	_build_inventory_menu(ui)
+
 	var bottom := PanelContainer.new()
 	bottom.position = Vector2(10, 300)
 	bottom.size = Vector2(620, 50)
@@ -247,6 +259,42 @@ func _build_hud() -> void:
 	dialogue_runner = RPGDialogueRunner.new()
 	add_child(dialogue_runner)
 	dialogue_runner.line_started.connect(func(line: String, _index: int) -> void: dialogue_label.text = line)
+
+func _build_inventory_menu(ui: CanvasLayer) -> void:
+	inventory_panel = PanelContainer.new()
+	inventory_panel.name = "InventoryMenu"
+	inventory_panel.position = Vector2(150, 92)
+	inventory_panel.size = Vector2(340, 176)
+	inventory_panel.add_theme_stylebox_override("panel", _panel_style("#17263c", "#d9bd82"))
+	inventory_panel.visible = false
+	ui.add_child(inventory_panel)
+
+	inventory_label = Label.new()
+	inventory_label.add_theme_color_override("font_color", Color("#fff2d4"))
+	inventory_label.add_theme_font_size_override("font_size", 14)
+	inventory_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	inventory_panel.add_child(inventory_label)
+	_update_inventory_menu()
+
+func _toggle_inventory() -> void:
+	inventory_open = not inventory_open
+	inventory_panel.visible = inventory_open
+	player.set_input_enabled(not inventory_open)
+	if inventory_open:
+		_update_inventory_menu()
+
+func _update_inventory_menu() -> void:
+	if inventory_label == null:
+		return
+	var potion := inventory.get_item(&"potion")
+	if potion == null:
+		inventory_label.text = "INVENTAIRE\\n\\nAucun objet enregistré.\\n\\nI / Échap : fermer"
+		return
+	inventory_label.text = "INVENTAIRE\\n\\n%s  x%d\\n%s\\n\\nI / Échap : fermer" % [
+		potion.display_name,
+		inventory.count(&"potion"),
+		potion.description
+	]
 
 func _talk_to_npc() -> void:
 	var dialogue := RPGDialogue.new()

@@ -112,7 +112,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 ### P2.2 — Inventory and items
 - [x] Add a reusable item Resource definition for consumables.
 - [x] Add a reusable stackable inventory with configurable per-item limits.
-- [~] Consume a healing item through the inventory in Valbrume battle; reusable out-of-battle use rules remain.
+- [x] Consume a healing item through the inventory in Valbrume battle.\n- [x] Add an exploration inventory menu showing item descriptions and quantities.
 - [ ] Add shop stock, buying and selling.
 - [ ] Add treasure containers and event rewards.
 
@@ -127,7 +127,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ## P3 — Battle system
 
-**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. Defeating the slime now grants 20 EXP and 15 G, updates the HUD, and unlocks Lila's closing dialogue; tests ensure the reward is granted only once. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. The demo's Potion is now defined by `RPGItemData` and consumed through `RPGInventory`; the inventory enforces stack limits and has dedicated unit tests. Connecting ATB to the demo command flow and adding party/target data remain planned.
+**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. Defeating the slime now grants 20 EXP and 15 G, updates the HUD, and unlocks Lila's closing dialogue; tests ensure the reward is granted only once. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. The demo's Potion is defined by `RPGItemData` and consumed through `RPGInventory`; an exploration menu (I) displays item details and pauses movement while open. The inventory enforces stack limits and has dedicated unit tests. Connecting ATB to the demo command flow and adding party/target data remain planned.
 
 ### P3.1 — Battle loop
 - [~] Turn the ATB timer foundation into a complete battle state machine (reusable gauge lifecycle is implemented; command orchestration remains).

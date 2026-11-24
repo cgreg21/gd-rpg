@@ -15,6 +15,15 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner") is RPGDialogueRunner, "Demo must use the dialogue runner")
 	assert(demo.get("inventory") is RPGInventory, "Demo must use the reusable inventory")
 	assert(demo.get("inventory").count(&"potion") == 1, "Demo must start with one potion")
+	assert(demo.get("inventory_panel") is PanelContainer, "Demo must create an inventory panel")
+	assert(not demo.get("inventory_panel").visible, "Inventory menu must start closed")
+	demo._toggle_inventory()
+	assert(demo.get("inventory_panel").visible, "Inventory menu must open")
+	assert(not demo.get("player").input_enabled, "Opening inventory must pause player movement")
+	assert(demo.get("inventory_label").text.contains("Potion") and demo.get("inventory_label").text.contains("x1"), "Inventory menu must display item name and quantity")
+	demo._toggle_inventory()
+	assert(not demo.get("inventory_panel").visible, "Inventory menu must close")
+	assert(demo.get("player").input_enabled, "Closing inventory must restore player movement")
 
 	var animation := demo.get("hero_animation") as AnimatedSprite2D
 	for direction in ["front", "back", "left", "right"]:
@@ -43,6 +52,6 @@ func _initialize() -> void:
 	assert(demo.get("dialogue_runner").is_running, "NPC conclusion must start a dialogue")
 	assert(demo.get("dialogue_label").text.contains("vaincu"), "NPC conclusion must acknowledge the victory")
 
-	print("Demo tests passed: animated hero, quest, battle commands, skills, items and defense.")
+	print("Demo tests passed: animated hero, quest, inventory menu, battle commands, skills, items and defense.")
 	demo.queue_free()
 	quit()

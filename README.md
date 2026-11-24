@@ -51,7 +51,7 @@ The final display pass is a borderless full-screen CRT effect. F3 toggles curvat
 
 The reusable inventory uses `RPGItemData` Resources and an `RPGInventory` node for stack limits, quantities, additions and removals. Valbrume starts with one Potion (3 PV); command 3 consumes it from the inventory, and headless tests cover stacking limits and invalid operations.\n\nThe demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
 
-- **Move:** arrow keys
+- **Move:** arrow keys\n- **Inventory:** I (close with I or Échap)
 - **Interact / collect:** E
 - **Battle commands:** 1 Attack, 2 Azure Spark, 3 Potion, 4 Defend (E/Enter also attacks)
 - **Advance dialogue:** Enter
