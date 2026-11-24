@@ -20,5 +20,17 @@ func _run() -> void:
 	assert(map.has_spawn_point(&"default"))
 	assert(map.get_spawn_position() == Vector2(32, 48))
 	assert(map.get_spawn_position(&"missing") == Vector2(32, 48))
-	print("World tests passed.")
+
+	var anchor := Node2D.new()
+	anchor.position = Vector2(10.4, 8.7)
+	root.add_child(anchor)
+	var camera := RPGPixelCamera.new()
+	anchor.add_child(camera)
+	camera._process(0.0)
+	assert(camera.offset.is_equal_approx(anchor.global_position.round() - anchor.global_position))
+	anchor.position = Vector2(11.2, 9.1)
+	camera._process(0.0)
+	assert(camera.offset.is_equal_approx(anchor.global_position.round() - anchor.global_position))
+
+	print("World and pixel camera tests passed.")
 	quit()
