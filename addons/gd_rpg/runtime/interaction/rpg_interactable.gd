@@ -1,3 +1,4 @@
+@tool
 class_name RPGInteractable
 extends Area2D
 ## Add to an Area2D to expose a simple interaction signal.

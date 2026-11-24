@@ -1,3 +1,4 @@
+@tool
 class_name RPGCharacter
 extends CharacterBody2D
 ## Simple top-down 8-direction controller. Replace the visual child with an AnimatedSprite2D.

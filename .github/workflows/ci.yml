@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Godot
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.4.1
+          use-dotnet: false
+          include-templates: false
       - name: Validate project
         run: godot --headless --editor --path . --quit
       - name: Run project smoke test
