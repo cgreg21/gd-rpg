@@ -36,7 +36,7 @@ func _run() -> void:
 	assert(router.take_spawn_id() == &"east", "Router must provide the pending spawn once")
 	assert(router.take_spawn_id().is_empty(), "Router must clear a consumed spawn")
 	router.set_transfer_data({"gold": 25, "inventory": {"potion": 2}})
-	var transfer := router.get_transfer_data()
+	var transfer: Dictionary = router.get_transfer_data()
 	assert(transfer.gold == 25 and transfer.inventory.potion == 2, "Router must preserve map transfer data")
 	transfer.gold = 0
 	assert(router.get_transfer_data().gold == 25, "Transfer data must be returned as a copy")
