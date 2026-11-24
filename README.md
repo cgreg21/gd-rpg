@@ -18,7 +18,9 @@ Open this repository in Godot and run the project (F6/F5). The main demo is asse
 
 The project renders at a virtual resolution of **320×180** and opens in a **1920×1080 (Full HD, 16:9)** window. This is an exact **6× integer scale**; nearest-neighbor filtering preserves crisp pixel edges. The logical resolution stays at 320×180, so gameplay and pixel-art assets do not need to be authored at 1080p. The demo supports **F3** to toggle the optional CRT overlay. A dedicated pixel-grid test scene is available at `examples/pixel_test/pixel_test.tscn`.
 
-GitHub Actions captures the demo and pixel-test scenes at 1920×1080, both with CRT disabled and enabled. Download the `gd-rpg-1080p-screenshots` artifact from the **Visual screenshots** workflow run. The captures are generated in a virtual X display; they validate the rendered output at the target resolution, but are not a substitute for checking on physical displays.\n\nThe initial CRT shader adds scanlines, a subtle vertical grille and vignette. It is an overlay, not a full framebuffer distortion pass; curvature, bloom and chromatic aberration are not implemented yet.
+GitHub Actions captures the demo and pixel-test scenes at 1920×1080, both with CRT disabled and enabled. Download the `gd-rpg-1080p-screenshots` artifact from the **Visual screenshots** workflow run. The captures are generated in a virtual X display; they validate the rendered output at the target resolution, but are not a substitute for checking on physical displays.
+
+The initial CRT shader adds scanlines, a subtle vertical grille and vignette. It is an overlay, not a full framebuffer distortion pass; curvature, bloom and chromatic aberration are not implemented yet.
 
 ## World and camera foundations
 
