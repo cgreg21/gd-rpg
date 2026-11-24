@@ -8,17 +8,22 @@ mkdir -p "$OUTPUT_DIR"
 capture_scene() {
   local scene="$1"
   local name="$2"
+  local crt="$3"
   local pid
   local window_id
+  local suffix="$name"
+
+  if [[ "$crt" == "1" ]]; then
+    suffix="${name}_crt"
+  fi
 
   if [[ -n "$scene" ]]; then
-    "$GODOT" --path . --audio-driver Dummy --resolution 1920x1080 --windowed "$scene" > "$OUTPUT_DIR/$name.log" 2>&1 &
+    GD_RPG_SCREENSHOT_CRT="$crt" "$GODOT" --path . --audio-driver Dummy --resolution 1920x1080 --windowed "$scene" > "$OUTPUT_DIR/$suffix.log" 2>&1 &
   else
-    "$GODOT" --path . --audio-driver Dummy --resolution 1920x1080 --windowed > "$OUTPUT_DIR/$name.log" 2>&1 &
+    GD_RPG_SCREENSHOT_CRT="$crt" "$GODOT" --path . --audio-driver Dummy --resolution 1920x1080 --windowed > "$OUTPUT_DIR/$suffix.log" 2>&1 &
   fi
   pid=$!
 
-  # Wait for the actual Godot window, not just for the process to start.
   for attempt in $(seq 1 20); do
     window_id="$(xdotool search --onlyvisible --pid "$pid" 2>/dev/null | head -n 1 || true)"
     [[ -n "$window_id" ]] && break
@@ -26,31 +31,29 @@ capture_scene() {
   done
 
   if [[ -z "$window_id" ]]; then
-    cat "$OUTPUT_DIR/$name.log"
-    echo "Godot window was not created for $name." >&2
+    cat "$OUTPUT_DIR/$suffix.log"
+    echo "Godot window was not created for $suffix." >&2
     kill "$pid" 2>/dev/null || true
     wait "$pid" 2>/dev/null || true
     return 1
   fi
 
   sleep 3
-  if grep -E "SCRIPT ERROR:|ERROR: Failed to load script|SHADER ERROR:|Shader compilation failed" "$OUTPUT_DIR/$name.log"; then
-    cat "$OUTPUT_DIR/$name.log"
-    echo "Godot reported a script loading error for $name." >&2
+  if grep -E "SCRIPT ERROR:|ERROR: Failed to load script|SHADER ERROR:|Shader compilation failed" "$OUTPUT_DIR/$suffix.log"; then
+    cat "$OUTPUT_DIR/$suffix.log"
+    echo "Godot reported a script or shader error for $suffix." >&2
     kill "$pid" 2>/dev/null || true
     wait "$pid" 2>/dev/null || true
     return 1
   fi
 
-  import -window "$window_id" "$OUTPUT_DIR/$name.png"
-  xdotool key --window "$window_id" --clearmodifiers F3
-  sleep 1
-  import -window "$window_id" "$OUTPUT_DIR/${name}_crt.png"
-
+  import -window "$window_id" "$OUTPUT_DIR/$suffix.png"
   kill "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
-  cat "$OUTPUT_DIR/$name.log"
+  cat "$OUTPUT_DIR/$suffix.log"
 }
 
-capture_scene "" "demo"
-capture_scene "res://examples/pixel_test/pixel_test.tscn" "pixel-test"
+for crt in 0 1; do
+  capture_scene "" "demo" "$crt"
+  capture_scene "res://examples/pixel_test/pixel_test.tscn" "pixel-test" "$crt"
+done
