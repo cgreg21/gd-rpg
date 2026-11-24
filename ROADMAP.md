@@ -126,7 +126,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [~] Save the Valbrume player position, stats, inventory and quest flags; party, switches, variables and map transitions remain planned.
 - [ ] Add multiple save slots and basic save metadata.
 - [ ] Handle missing or outdated resource references safely.
-- [x] Add headless save/load coverage and F5/F9 exploration controls.
+- [x] Add headless save/load coverage, including restoring world objects from an earlier save, and F5/F9 exploration controls.
 
 **Acceptance:** a player can save during exploration, restart the game, load, and continue with the same party, inventory and quest state.
 
@@ -225,7 +225,7 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
 - [x] Run the headless editor validation, world unit tests and runtime smoke test in GitHub Actions.
-- [x] Perform a KISS refactor, then verify CI on the exact commit pushed to `main` (input handling, potion use and inventory listing).
+- [x] Perform a KISS refactor, then verify CI on the exact commit pushed to `main` (input handling, potion use, inventory listing and Valbrume save/load).
 
 ## Suggested implementation order
 
