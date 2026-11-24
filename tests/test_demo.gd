@@ -1,6 +1,12 @@
 extends SceneTree
 
 func _initialize() -> void:
+	var test_finished := false
+	create_timer(30.0).timeout.connect(func() -> void:
+		if not test_finished:
+			push_error("Playable demo tests timed out.")
+			quit(1)
+	)
 	var scene := load("res://examples/demo/demo.tscn") as PackedScene
 	assert(scene != null, "Playable demo scene must exist")
 	var demo := scene.instantiate()
@@ -99,6 +105,7 @@ func _initialize() -> void:
 	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Loading must restore inventory quantities")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
 
+	test_finished = true
 	print("Demo tests passed: animated hero, quest, locked door, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()
