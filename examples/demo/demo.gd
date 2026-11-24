@@ -437,7 +437,8 @@ func _load_game() -> bool:
 			_show_message("Sauvegarde invalide.")
 			return false
 	for key in ["hp", "mp", "experience", "gold"]:
-		if not data.get(key) is int:
+		var value: Variant = data.get(key)
+		if not (value is int or value is float) or int(value) != value:
 			_show_message("Sauvegarde invalide.")
 			return false
 	for flag in ["has_crystal", "chest_opened", "door_opened", "slime_defeated"]:
@@ -445,7 +446,8 @@ func _load_game() -> bool:
 			_show_message("Sauvegarde invalide.")
 			return false
 	for item_id in saved_items:
-		if not item_id in ["potion", "old_key"] or not saved_items[item_id] is int or saved_items[item_id] < 0:
+		var amount: Variant = saved_items[item_id]
+		if not item_id in ["potion", "old_key"] or not (amount is int or amount is float) or int(amount) != amount or amount < 0:
 			_show_message("Sauvegarde invalide.")
 			return false
 	if data.hp < 1 or data.hp > 5 or data.mp < 0 or data.mp > 3 or data.experience < 0 or data.gold < 0:
@@ -456,10 +458,10 @@ func _load_game() -> bool:
 		return false
 
 	player.position = Vector2(float(position[0]), float(position[1]))
-	player_hp = data.hp
-	player_mp = data.mp
-	experience = data.experience
-	gold = data.gold
+	player_hp = int(data.hp)
+	player_mp = int(data.mp)
+	experience = int(data.experience)
+	gold = int(data.gold)
 	has_crystal = data.has_crystal
 	chest_opened = data.chest_opened
 	door_opened = data.door_opened
@@ -467,7 +469,7 @@ func _load_game() -> bool:
 	for item_id in inventory.item_ids():
 		inventory.remove_item(item_id, inventory.count(item_id))
 	for item_id in saved_items:
-		inventory.add_item(StringName(item_id), saved_items[item_id])
+		inventory.add_item(StringName(item_id), int(saved_items[item_id]))
 	_restore_world_objects()
 	slime_hp = 0 if slime_defeated else 3
 	player.set_input_enabled(true)
