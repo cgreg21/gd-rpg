@@ -1,26 +1,32 @@
 # GD RPG Engine
 
-A modular 2D JRPG engine for Godot 4, inspired by the readable overworld exploration and party-driven encounters of 16-bit-era JRPGs.
+A modular 2D JRPG engine for Godot 4, inspired by the exploration, party-driven encounters and presentation of 16-bit-era JRPGs.
 
 ## Goals
 - Top-down exploration, interactions and map transitions
 - Data-driven actors, items, skills and encounters
 - Dialogue and event sequencing
 - Active Time Battle (ATB) combat foundation
+- Pixel-perfect 2D presentation with optional CRT effects
 - Editor-friendly GDScript resources and plugin tooling
 
 ## Requirements
-- Godot 4.3+ (GDScript, no third-party runtime dependencies)
+- Godot 4.4.1 (GDScript, no third-party runtime dependencies)
 
 ## Run
-Open this repository in Godot and run the project (F6/F5). The demo is intentionally asset-free so the core systems can be tested immediately.
+Open this repository in Godot and run the project (F6/F5). The main demo is asset-free.
+
+The project renders at a virtual resolution of **320×180**. The viewport uses integer scaling and nearest-neighbor filtering to preserve pixel edges. The demo supports **F3** to toggle the optional CRT overlay. A dedicated pixel-grid test scene is available at `examples/pixel_test/pixel_test.tscn`.
+
+The initial CRT shader adds scanlines, a subtle vertical grille and vignette. It is an overlay, not a full framebuffer distortion pass; curvature, bloom and chromatic aberration are not implemented yet.
 
 ## Layout
-- `addons/gd_rpg/runtime`: reusable runtime systems
+- `addons/gd_rpg/runtime`: reusable runtime systems, including display effects
 - `addons/gd_rpg/data`: typed Resource definitions
 - `addons/gd_rpg/ui`: reusable UI
 - `addons/gd_rpg/editor`: editor integration
 - `examples/demo`: playable systems showcase
+- `examples/pixel_test`: pixel-grid and CRT test scene
 - `tests`: automated smoke checks
 
-See [ROADMAP.md](ROADMAP.md) for the implementation plan.
+See [ROADMAP.md](ROADMAP.md) for the implementation plan and remaining work.
