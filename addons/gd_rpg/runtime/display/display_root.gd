@@ -1,11 +1,12 @@
 extends Control
 class_name RPGDisplayRoot
-## Renders game content at 640x360, then applies CRT at the native window resolution.
+## Renders game content at 640x360, scales it to the window, then applies CRT.
 
 const INTERNAL_SIZE := Vector2i(640, 360)
 
 @export var content_scene: PackedScene
 
+var internal_viewport: SubViewport
 var crt_overlay: RPGCRTOverlay
 
 func _ready() -> void:
@@ -13,26 +14,28 @@ func _ready() -> void:
 	_build_crt_overlay()
 
 func _build_viewport() -> void:
-	var container := SubViewportContainer.new()
-	container.name = "GameViewport"
-	container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	container.stretch = true
-	container.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	add_child(container)
-
-	var viewport := SubViewport.new()
-	viewport.name = "InternalViewport"
-	viewport.size = INTERNAL_SIZE
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	viewport.handle_input_locally = false
-	container.add_child(viewport)
+	internal_viewport = SubViewport.new()
+	internal_viewport.name = "InternalViewport"
+	internal_viewport.size = INTERNAL_SIZE
+	internal_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	internal_viewport.handle_input_locally = false
+	add_child(internal_viewport)
 
 	if content_scene == null:
 		push_error("RPGDisplayRoot requires a content_scene.")
 		return
 
-	var content := content_scene.instantiate()
-	viewport.add_child(content)
+	internal_viewport.add_child(content_scene.instantiate())
+
+	var game_texture := TextureRect.new()
+	game_texture.name = "GameTexture"
+	game_texture.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	game_texture.texture = internal_viewport.get_texture()
+	game_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	game_texture.stretch_mode = TextureRect.STRETCH_SCALE
+	game_texture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	game_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(game_texture)
 
 func _build_crt_overlay() -> void:
 	crt_overlay = RPGCRTOverlay.new()
