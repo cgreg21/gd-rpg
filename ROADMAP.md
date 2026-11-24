@@ -66,13 +66,13 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 ### P1.0 — Pixel-perfect rendering foundation
 - [ ] Implement the virtual resolution and integer viewport scaling rules above.
 - [ ] Configure nearest-neighbor filtering as the default for pixel-art content.
-- [ ] Add a reusable pixel-aligned camera setup (verify against scrolling maps before marking complete).
+- [x] Add a reusable pixel-aligned camera setup that rounds camera world coordinates to whole virtual pixels (scrolling-map verification remains).
 - [x] Add a pixel-grid test scene with a moving marker, tile grid and UI to reveal filtering issues.
 - [x] Add an optional CRT overlay shader with clean and CRT modes (scanlines, grille and vignette).
 - [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
 - [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. The demo and pixel test scene expose the CRT overlay (scanlines, grille and vignette), toggleable at runtime. Camera pixel snapping, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI only validates import/runtime startup; it does not replace manual visual inspection.
+**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` rounds camera coordinates to whole virtual pixels and is used by the demo. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay remains toggleable at runtime. Scrolling-map camera verification, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
@@ -207,11 +207,12 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Keep scripts focused and avoid abstractions without a concrete use case.
 - [ ] Use typed GDScript and clear names.
 - [ ] Keep reusable engine code under `addons/gd_rpg/`; keep demo-specific code under `examples/`.
+- [x] Add headless tests for named map spawn lookup and default fallback.
 - [ ] Add tests for logic that can be tested without rendering.
 - [x] Add a reproducible automated screenshot capture for visual behavior (GitHub Actions/Xvfb); retain manual checks on physical displays.
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
-- [ ] Run the headless editor validation and runtime smoke test.
+- [x] Run the headless editor validation, world unit tests and runtime smoke test in GitHub Actions.
 - [ ] Perform a KISS refactor, then verify CI on the exact commit pushed to `main`.
 
 ## Suggested implementation order
