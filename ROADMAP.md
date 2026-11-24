@@ -22,7 +22,7 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 
 ### Pixel-perfect rendering rules
 - [x] Set the virtual resolution to 320×180, with a documented 16:9 presentation.
-- [x] Open the game at 1920×1080 Full HD by default (exact 6× integer scale).
+- [x] Open the game at 1920×1080 Full HD by default (exact 6× integer scale).\n- [x] Add a GitHub Actions visual capture workflow for demo/pixel-test scenes, clean and CRT, at 1080p.
 - [x] Configure viewport stretching with integer scaling; Godot uses letterboxing/pillarboxing rather than fractional pixel scaling.
 - [x] Set the default window size to 1920×1080 (Full HD, 16:9).
 - [x] Set nearest-neighbor canvas texture filtering as the project default.
@@ -208,7 +208,7 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Use typed GDScript and clear names.
 - [ ] Keep reusable engine code under `addons/gd_rpg/`; keep demo-specific code under `examples/`.
 - [ ] Add tests for logic that can be tested without rendering.
-- [ ] Add a reproducible manual test for visual/editor behavior.
+- [x] Add a reproducible automated screenshot capture for visual behavior (GitHub Actions/Xvfb); retain manual checks on physical displays.
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
 - [ ] Run the headless editor validation and runtime smoke test.
