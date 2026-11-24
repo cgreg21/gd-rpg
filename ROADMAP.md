@@ -2,7 +2,7 @@
 
 A practical, incremental plan for a reusable 2D JRPG engine built with Godot 4 and GDScript.
 
-The target is the feel and systems of classic 16-bit JRPGs: readable top-down exploration, story-driven events, a memorable party, and an Active Time Battle (ATB) combat loop. The project will use original sample content and assets; it will not depend on proprietary game data.
+The target is the feel and systems of classic 16-bit JRPGs: readable top-down exploration, story-driven events, a memorable party, and an Active Time Battle (ATB) combat loop. The visual target is **pixel-perfect 2D with an optional CRT display shader**, inspired by the presentation of 16-bit console RPGs. The project will use original sample content and assets; it will not depend on proprietary game data.
 
 **Status legend:** [x] Done · [~] In progress · [ ] Planned
 
@@ -14,7 +14,33 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - **Modular layout:** keep runtime, data, UI, editor tools, examples and tests in separate subdirectories.
 - **Playable increments:** each milestone should leave the demo runnable.
 - **No mandatory third-party runtime dependencies.**
+- **Pixel-art integrity:** render at a fixed virtual resolution, preserve integer pixel scaling, and avoid filtered or subpixel movement.
+- **Optional CRT presentation:** CRT effects must be configurable and disableable; the clean pixel-perfect image remains available.
 - **Quality with every change:** refactor for simplicity, add or update tests, and verify the exact commit's CI before calling work complete.
+
+## Visual direction — pixel-perfect 16-bit + CRT
+
+### Pixel-perfect rendering rules
+- [ ] Set a configurable virtual resolution, initially 320×180, with a documented 16:9 presentation.
+- [ ] Scale the game viewport using integer scaling wherever possible; use letterboxing/pillarboxing rather than fractional pixel scaling.
+- [ ] Configure nearest-neighbor texture filtering for pixel-art assets.
+- [ ] Keep sprite, tile and UI artwork aligned to the pixel grid.
+- [ ] Keep character and camera rendering pixel-aligned; avoid visible subpixel jitter while moving or following the player.
+- [ ] Define a consistent pixel-art scale for tiles, characters, portraits, effects and UI.
+- [ ] Ensure menus, dialogue boxes and battle HUD use the same pixel grid and scaling rules.
+- [ ] Document recommended import settings for spritesheets, tilesets and fonts.
+
+### CRT shader and display options
+- [ ] Add an optional full-screen CRT canvas shader, applied once at the final presentation stage.
+- [ ] Implement configurable scanlines and subtle phosphor/RGB grille mask.
+- [ ] Add restrained vignette and screen curvature controls.
+- [ ] Add optional, subtle bloom and chromatic aberration; keep both disabled or minimal by default.
+- [ ] Expose shader parameters through a small display settings resource or settings menu.
+- [ ] Provide clean, subtle CRT and stronger retro presets, plus a fully disabled mode.
+- [ ] Ensure the shader does not blur source pixels excessively or make text/UI hard to read.
+- [ ] Check shader performance at the target resolution and on integrated GPUs.
+
+**Visual acceptance:** at integer scale, source pixels remain crisp and stable during movement; the CRT effect can be toggled without changing gameplay or breaking UI readability. The clean mode must look correct without any CRT shader.
 
 ## P0 — Project foundation
 
@@ -34,6 +60,17 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - CI validates the pushed commit on `main`.
 
 ## P1 — Exploration and world
+
+### P1.0 — Pixel-perfect rendering foundation
+- [ ] Implement the virtual resolution and integer viewport scaling rules above.
+- [ ] Configure nearest-neighbor filtering as the default for pixel-art content.
+- [ ] Add a reusable pixel-aligned camera setup.
+- [ ] Add a test scene with a moving character, scrolling tilemap and pixel-art UI to reveal jitter or filtering issues.
+- [ ] Add the optional CRT shader and clean/CRT display presets.
+- [ ] Add a display setting to enable/disable CRT and adjust effect strength.
+- [ ] Document the art/import guidelines and shader limitations.
+
+**Acceptance:** the test scene stays crisp at supported window sizes; CRT can be toggled at runtime, with no fractional scaling artifacts introduced by the engine's default presentation path.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
@@ -122,6 +159,7 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - [ ] Add audio buses, sound effects and music transitions.
 - [ ] Add controller support and configurable input actions.
 - [ ] Add UI scaling, readable fonts and accessibility options.
+- [ ] Add display settings for virtual resolution/window mode and CRT presets.
 - [ ] Add transition effects for maps, battles and important events.
 
 **Acceptance:** the sample quest can be completed using keyboard or controller, with dialogue, menus, audio and configurable presentation.
@@ -142,6 +180,7 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 - [ ] Include several NPCs, one quest, shops, treasure and save/load.
 - [ ] Include a small party, equipment, skills and enemy formations.
 - [ ] Provide original placeholder art/audio that can be replaced easily.
+- [ ] Showcase both clean pixel-perfect rendering and optional CRT presentation.
 
 **Acceptance:** a new user can open the demo, understand the project structure, play the vertical slice, and create a small variation by editing resources and scenes.
 
@@ -149,10 +188,11 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 
 - [ ] Add automated tests for data resources and core runtime systems.
 - [ ] Add deterministic test hooks for battle and event sequencing where practical.
-- [ ] Add performance checks for map/event-heavy scenes.
+- [ ] Add performance checks for map/event-heavy scenes and the CRT shader.
 - [ ] Test supported Godot 4 versions and document the compatibility range.
 - [ ] Document installation, setup, architecture and extension points.
 - [ ] Add tutorials: first map, first NPC, first quest and first battle.
+- [ ] Document pixel-art import settings, virtual resolution and CRT configuration.
 - [ ] Add a changelog and versioning policy.
 - [ ] Prepare a tagged example release.
 
@@ -168,21 +208,23 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Add tests for logic that can be tested without rendering.
 - [ ] Add a reproducible manual test for visual/editor behavior.
 - [ ] Update the README or relevant docs when public behavior changes.
+- [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
 - [ ] Run the headless editor validation and runtime smoke test.
 - [ ] Perform a KISS refactor, then verify CI on the exact commit pushed to `main`.
 
 ## Suggested implementation order
 
-1. P1.1 Maps, spawn points and transitions.
-2. P1.2 Event commands and a small quest.
-3. P2.1 Party and character progression.
-4. P2.2 Inventory and items.
-5. P2.3 Save/load.
-6. P3.1 Complete battle loop.
-7. P3.2 Skills, enemies and encounters.
-8. P3.3 Battle presentation.
-9. P4 Dialogue and player-facing menus.
-10. P5 Editor workflow and vertical-slice demo.
-11. P6 Hardening, documentation and release.
+1. P1.0 Pixel-perfect rendering and CRT foundation.
+2. P1.1 Maps, spawn points and transitions.
+3. P1.2 Event commands and a small quest.
+4. P2.1 Party and character progression.
+5. P2.2 Inventory and items.
+6. P2.3 Save/load.
+7. P3.1 Complete battle loop.
+8. P3.2 Skills, enemies and encounters.
+9. P3.3 Battle presentation.
+10. P4 Dialogue and player-facing menus.
+11. P5 Editor workflow and vertical-slice demo.
+12. P6 Hardening, documentation and release.
 
 Priorities describe implementation order, not promises or fixed dates. Keep each task small enough to review, test and ship independently.
