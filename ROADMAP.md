@@ -127,12 +127,14 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ## P3 — Battle system
 
+**Progress:** Valbrume now demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. This is a deliberately small turn-based demonstration; the reusable ATB state machine, party/target model, data-driven skills and rewards are still planned.
+
 ### P3.1 — Battle loop
 - [ ] Turn the ATB timer foundation into a complete battle state machine.
 - [ ] Add battle start/end flow and party/enemy sides.
-- [ ] Add battle command selection (attack, skill, item, defend).
+- [x] Add a first playable battle command menu in Valbrume (attack, skill, item, defend); reusable battle-state integration remains.
 - [ ] Add target selection and valid-target rules.
-- [ ] Add damage, healing, critical hits and defeat handling.
+- [~] Add basic damage, healing, defense and victory/defeat handling in the demo; critical hits and reusable battle rules remain.
 - [ ] Add victory rewards, experience and drops.
 - [ ] Add escape rules and game-over handling.
 
