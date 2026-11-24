@@ -36,6 +36,12 @@ var inventory: RPGInventory
 var inventory_panel: PanelContainer
 var inventory_label: Label
 var inventory_open := false
+var save_panel: PanelContainer
+var save_label: Label
+var save_action_label: Label
+var selected_save_slot := 1
+var save_menu_open := false
+var overwrite_pending := false
 var slime_hp := 3
 var battle_active := false
 var defending := false
@@ -85,13 +91,29 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode in [KEY_F9, KEY_F10, KEY_F11]:
 			_load_game(event.keycode - KEY_F8)
 			return
+	if save_menu_open:
+		if event is InputEventKey and event.pressed and not event.echo:
+			if event.keycode in [KEY_S, KEY_ESCAPE]:
+				_toggle_save_menu()
+				return
+			if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+				if overwrite_pending:
+					_save_selected_slot()
+				else:
+					_load_selected_slot()
+				return
+		return
 	if inventory_open:
 		if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_I, KEY_ESCAPE]:
 			_toggle_inventory()
 		return
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_I and not battle_active:
-		_toggle_inventory()
-		return
+	if event is InputEventKey and event.pressed and not event.echo and not battle_active:
+		if event.keycode == KEY_I:
+			_toggle_inventory()
+			return
+		if event.keycode == KEY_S:
+			_toggle_save_menu()
+			return
 	if battle_active:
 		if event is InputEventKey and event.pressed and not event.echo:
 			match event.keycode:
@@ -361,6 +383,7 @@ func _build_hud() -> void:
 	row.add_child(hp_label)
 
 	_build_inventory_menu(ui)
+	_build_save_menu(ui)
 
 	var bottom := PanelContainer.new()
 	bottom.position = Vector2(10, 300)
@@ -404,6 +427,103 @@ func _build_inventory_menu(ui: CanvasLayer) -> void:
 	inventory_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	inventory_panel.add_child(inventory_label)
 	_update_inventory_menu()
+
+
+func _build_save_menu(ui: CanvasLayer) -> void:
+	save_panel = PanelContainer.new()
+	save_panel.name = "SaveMenu"
+	save_panel.position = Vector2(120, 62)
+	save_panel.size = Vector2(400, 236)
+	save_panel.add_theme_stylebox_override("panel", _panel_style("#17263c", "#d9bd82"))
+	save_panel.visible = false
+	ui.add_child(save_panel)
+	var content := VBoxContainer.new()
+	save_panel.add_child(content)
+	save_label = Label.new()
+	save_label.add_theme_color_override("font_color", Color("#fff2d4"))
+	save_label.add_theme_font_size_override("font_size", 13)
+	content.add_child(save_label)
+	var slots := HBoxContainer.new()
+	content.add_child(slots)
+	for slot in range(1, RPGMapRouter.SAVE_SLOT_COUNT + 1):
+		var button := Button.new()
+		button.text = "Slot %d" % slot
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.pressed.connect(_select_save_slot.bind(slot))
+		slots.add_child(button)
+	var actions := HBoxContainer.new()
+	content.add_child(actions)
+	var load_button := Button.new()
+	load_button.text = "Charger"
+	load_button.pressed.connect(_load_selected_slot)
+	actions.add_child(load_button)
+	var save_button := Button.new()
+	save_button.text = "Sauvegarder"
+	save_button.pressed.connect(_request_save_selected_slot)
+	actions.add_child(save_button)
+	var cancel_button := Button.new()
+	cancel_button.text = "Annuler"
+	cancel_button.pressed.connect(_toggle_save_menu)
+	actions.add_child(cancel_button)
+	save_action_label = Label.new()
+	save_action_label.add_theme_color_override("font_color", Color("#e4c77e"))
+	save_action_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(save_action_label)
+	_update_save_menu()
+
+func _toggle_save_menu() -> void:
+	if battle_active or inventory_open:
+		return
+	save_menu_open = not save_menu_open
+	save_panel.visible = save_menu_open
+	player.set_input_enabled(not save_menu_open)
+	overwrite_pending = false
+	if save_menu_open:
+		_update_save_menu()
+
+func _select_save_slot(slot: int) -> void:
+	selected_save_slot = clampi(slot, 1, RPGMapRouter.SAVE_SLOT_COUNT)
+	overwrite_pending = false
+	_update_save_menu()
+
+func _update_save_menu() -> void:
+	if save_label == null:
+		return
+	var lines := ["SAUVEGARDE / CHARGEMENT", ""]
+	for slot in range(1, RPGMapRouter.SAVE_SLOT_COUNT + 1):
+		var metadata := RPGMapRouter.get_save_metadata(slot)
+		var description := "Vide"
+		if not metadata.is_empty():
+			var date := Time.get_datetime_string_from_unix_time(metadata.saved_at, true)
+			var minutes := int(metadata.play_time) / 60
+			description = "%s — %s — %dh%02d" % [metadata.map, date, minutes / 60, minutes % 60]
+		lines.append("%s Slot %d : %s" % [">" if slot == selected_save_slot else " ", slot, description])
+	lines.append("")
+	lines.append("S : fermer  •  Choisir un slot puis Charger ou Sauvegarder")
+	save_label.text = "\\n".join(lines)
+
+func _request_save_selected_slot() -> void:
+	if not RPGMapRouter.get_save_metadata(selected_save_slot).is_empty():
+		overwrite_pending = true
+		save_action_label.text = "Remplacer le slot %d ? Cliquez encore sur Sauvegarder pour confirmer." % selected_save_slot
+		return
+	_save_selected_slot()
+
+func _save_selected_slot() -> void:
+	if _save_game(selected_save_slot):
+		save_action_label.text = "Slot %d sauvegardé." % selected_save_slot
+		overwrite_pending = false
+		_update_save_menu()
+
+func _load_selected_slot() -> void:
+	if RPGMapRouter.get_save_metadata(selected_save_slot).is_empty():
+		save_action_label.text = "Ce slot est vide."
+		return
+	if _load_game(selected_save_slot):
+		save_menu_open = false
+		save_panel.visible = false
+		player.set_input_enabled(true)
+		overwrite_pending = false
 
 func _toggle_inventory() -> void:
 	inventory_open = not inventory_open
@@ -467,7 +587,7 @@ func _restore_transfer_state() -> void:
 	status_label.text = _objective_text()
 
 func _save_game(slot: int = 1) -> bool:
-	if battle_active or inventory_open:
+	if battle_active or inventory_open or save_menu_open:
 		_show_message("Sauvegarde indisponible pendant un menu ou un combat.")
 		return false
 	_store_transfer_state()
@@ -476,7 +596,7 @@ func _save_game(slot: int = 1) -> bool:
 	return saved
 
 func _load_game(slot: int = 1) -> bool:
-	if battle_active or inventory_open:
+	if battle_active or inventory_open or (save_menu_open and not overwrite_pending):
 		_show_message("Chargement indisponible pendant un menu ou un combat.")
 		return false
 	if not RPGMapRouter.load_game(map_id, slot):
