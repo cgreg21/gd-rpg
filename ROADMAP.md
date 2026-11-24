@@ -127,7 +127,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ## P3 — Battle system
 
-**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. Connecting this manager to the demo's command flow, then adding party/target data and rewards, remains planned.
+**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. Defeating the slime now grants 20 EXP and 15 G, updates the HUD, and unlocks Lila's closing dialogue; tests ensure the reward is granted only once. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. Connecting this manager to the demo's command flow, then adding party/target data and rewards, remains planned.
 
 ### P3.1 — Battle loop
 - [~] Turn the ATB timer foundation into a complete battle state machine (reusable gauge lifecycle is implemented; command orchestration remains).
@@ -135,7 +135,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add a first playable battle command menu in Valbrume (attack, skill, item, defend); reusable battle-state integration remains.
 - [ ] Add target selection and valid-target rules.
 - [~] Add basic damage, healing, defense and victory/defeat handling in the demo; critical hits and reusable battle rules remain.
-- [ ] Add victory rewards, experience and drops.
+- [x] Add a first victory reward loop in Valbrume (20 EXP, 15 G and NPC conclusion); reusable reward/drop tables remain planned.
 - [ ] Add escape rules and game-over handling.
 
 ### P3.2 — Skills, enemies and encounters
