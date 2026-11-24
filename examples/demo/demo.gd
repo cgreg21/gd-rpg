@@ -27,6 +27,7 @@ var chest_opened := false
 var door: Node2D
 var door_opened := false
 var route_portal: Node2D
+var sanctuary_portal: Node2D
 var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
@@ -109,6 +110,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var distance_chest := player.global_position.distance_to(CHEST_POSITION)
 	var distance_door := player.global_position.distance_to(DOOR_POSITION)
 	var distance_portal := player.global_position.distance_to(ROUTE_PORTAL_POSITION)
+	var distance_sanctuary := player.global_position.distance_to(DOOR_POSITION)
 	if distance_npc < 42.0:
 		_talk_to_npc()
 	elif distance_crystal < 30.0 and not has_crystal:
@@ -119,6 +121,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_open_chest()
 	elif distance_door < 40.0 and not door_opened:
 		_open_door()
+	elif distance_sanctuary < 38.0 and door_opened:
+		player.set_input_enabled(false)
+		RPGMapRouter.transition_to("res://examples/demo/sanctuary.tscn", &"village_entry")
 	elif distance_portal < 38.0:
 		player.set_input_enabled(false)
 		RPGMapRouter.transition_to("res://examples/demo/route.tscn", &"village_gate")
@@ -137,6 +142,10 @@ func _build_world() -> void:
 	route_spawn.name = "village_return"
 	route_spawn.position = Vector2(90, 278)
 	spawn_points.add_child(route_spawn)
+	var sanctuary_spawn := Marker2D.new()
+	sanctuary_spawn.name = "sanctuary_return"
+	sanctuary_spawn.position = Vector2(570, 215)
+	spawn_points.add_child(sanctuary_spawn)
 
 	var ground := ColorRect.new()
 	ground.size = WORLD_SIZE
@@ -224,6 +233,8 @@ func _build_characters() -> void:
 	add_child(chest)
 	door = _create_door()
 	add_child(door)
+	if door_opened:
+		_create_sanctuary_portal()
 
 func _create_route_portal() -> Node2D:
 	var node := Node2D.new()
@@ -232,6 +243,16 @@ func _create_route_portal() -> Node2D:
 	_draw_diamond(node, Color("#8be6c5"))
 	_add_name_tag(node, "Chemin")
 	return node
+
+func _create_sanctuary_portal() -> void:
+	if is_instance_valid(sanctuary_portal):
+		return
+	sanctuary_portal = Node2D.new()
+	sanctuary_portal.name = "SanctuaryPortal"
+	sanctuary_portal.position = DOOR_POSITION
+	_draw_diamond(sanctuary_portal, Color("#f3d78a"))
+	_add_name_tag(sanctuary_portal, "Entrée")
+	add_child(sanctuary_portal)
 
 func _create_crystal() -> Node2D:
 	var node := Node2D.new()
@@ -279,6 +300,7 @@ func _restore_world_objects() -> void:
 	if door_opened:
 		if is_instance_valid(door):
 			door.queue_free()
+		_create_sanctuary_portal()
 	elif not is_instance_valid(door) or door.is_queued_for_deletion():
 		door = _create_door()
 		add_child(door)
@@ -593,7 +615,8 @@ func _open_door() -> void:
 	_update_battle_hud()
 	_update_inventory_menu()
 	status_label.text = _objective_text()
-	_show_message("Le sanctuaire s'ouvre ! +20 G.")
+	_create_sanctuary_portal()
+	_show_message("Le sanctuaire s'ouvre ! +20 G. E : entrer.")
 
 func _enemy_turn() -> void:
 	if not battle_active:
@@ -666,7 +689,8 @@ func _draw_battle_overlay(show: bool) -> void:
 func _update_prompt() -> void:
 	var nearest := 999.0
 	var prompt := ""
-	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"], [DOOR_POSITION, "E : Déverrouiller"], [ROUTE_PORTAL_POSITION, "E : Explorer le chemin"]]:
+	var door_prompt := "E : Entrer au sanctuaire" if door_opened else "E : Déverrouiller"
+	for candidate in [[NPC_POSITION, "E : Parler"], [CRYSTAL_POSITION, "E : Prendre"], [SLIME_POSITION, "E : Combattre"], [CHEST_POSITION, "E : Ouvrir le coffre"], [DOOR_POSITION, door_prompt], [ROUTE_PORTAL_POSITION, "E : Explorer le chemin"]]:
 		var distance: float = player.global_position.distance_to(candidate[0])
 		if distance < nearest:
 			nearest = distance

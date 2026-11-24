@@ -22,6 +22,7 @@ func _initialize() -> void:
 	assert(demo.get("slime") != null, "Demo must create its encounter")
 	assert(demo.get("route_portal") != null, "Village must provide an exit to the connected route")
 	assert(demo.has_spawn_point(&"village_return"), "Village must expose a return spawn")
+	assert(demo.has_spawn_point(&"sanctuary_return"), "Village must expose a sanctuary return spawn")
 	var route_scene := load("res://examples/demo/route.tscn") as PackedScene
 	assert(route_scene != null, "Connected route scene must exist")
 	var route := route_scene.instantiate()
@@ -64,6 +65,17 @@ func _initialize() -> void:
 	assert(demo.get("inventory").count(&"old_key") == 0, "Unlocking must consume the old key")
 	assert(demo.get("gold") == 30, "Sanctuary must award twenty gold")
 	assert(demo.get("door").is_queued_for_deletion(), "Unlocked door must be removed")
+	assert(demo.get("sanctuary_portal") != null, "Unlocking the door must reveal the sanctuary entrance")
+	var sanctuary_scene := load("res://examples/demo/sanctuary.tscn") as PackedScene
+	assert(sanctuary_scene != null, "Sanctuary interior scene must exist")
+	var sanctuary := sanctuary_scene.instantiate()
+	root.add_child(sanctuary)
+	await process_frame
+	assert(sanctuary is RPGMap and sanctuary.map_id == &"valbrume_sanctuary", "Sanctuary must be a reusable RPGMap")
+	assert(sanctuary.has_spawn_point(&"village_entry"), "Sanctuary must expose its village entry spawn")
+	assert(sanctuary.get("player") is RPGCharacter, "Sanctuary must create the player")
+	sanctuary.queue_free()
+	await process_frame
 	demo._open_door()
 	assert(demo.get("gold") == 30, "Sanctuary reward must only be granted once")
 	demo._toggle_inventory()
@@ -122,6 +134,6 @@ func _initialize() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
 
 	test_finished = true
-	print("Demo tests passed: connected maps, animated hero, quest, locked door, treasure, inventory and battle commands.")
+	print("Demo tests passed: three connected maps, animated hero, quest, locked door, treasure, inventory and battle commands.")
 	demo.queue_free()
 	quit()
