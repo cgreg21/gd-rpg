@@ -55,9 +55,11 @@ void fragment() {
 	glow *= 0.25;
 	image += max(glow - image, vec3(0.0)) * bloom_strength * crt_enabled;
 
-	// Three-output-pixel cadence makes scanlines readable after 3x upscaling.
-	float scanline_phase = mod(FRAGCOORD.y, 3.0) / 3.0;
-	float scanline = 1.0 - scanline_strength * (0.5 + 0.5 * cos(scanline_phase * 6.2831853));
+	// One dark 3-pixel output band between each pair of source pixel rows.
+	// This matches the 640x360 -> 1920x1080 integer upscale exactly.
+	float source_row = floor(screen_uv.y * 360.0);
+	float scanline_phase = mod(source_row, 2.0);
+	float scanline = mix(1.0 - scanline_strength, 1.0, scanline_phase);
 	float grille_phase = mod(floor(screen_uv.x / SCREEN_PIXEL_SIZE.x), 3.0);
 	vec3 grille = vec3(1.0 - grille_strength * 0.35);
 	if (grille_phase < 1.0) {
