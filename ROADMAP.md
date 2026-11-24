@@ -79,7 +79,8 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
 - [x] Add an `RPGMap` base with named `Marker2D` spawn points and default-spawn fallback.
-- [x] Add a named default spawn marker to the demo map.\n- [x] Create the Valbrume demo slice with an original four-direction pixel-art hero, village scenery, NPC quest, collectible crystal and turn-based slime encounter.
+- [x] Add a named default spawn marker to the demo map.
+- [x] Create the Valbrume demo slice with an original four-direction pixel-art hero, village scenery, NPC quest, collectible crystal and turn-based slime encounter.
 - [ ] Add map-to-map transitions with fade in/out.
 - [ ] Preserve party and world state when changing maps.
 - [ ] Add camera follow, limits and optional room framing.
@@ -112,7 +113,8 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 ### P2.2 — Inventory and items
 - [x] Add a reusable item Resource definition for consumables.
 - [x] Add a reusable stackable inventory with configurable per-item limits.
-- [x] Consume a healing item through the inventory in Valbrume battle.\n- [x] Add an exploration inventory menu showing item descriptions and quantities.
+- [x] Consume a healing item through the inventory in Valbrume battle.
+- [x] Add an exploration inventory menu showing item descriptions and quantities.
 - [ ] Add shop stock, buying and selling.
 - [ ] Add treasure containers and event rewards.
 
@@ -214,7 +216,8 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Keep reusable engine code under `addons/gd_rpg/`; keep demo-specific code under `examples/`.
 - [x] Add headless tests for named map spawn lookup and default fallback.
 - [x] Add headless tests for map spawn fallback and pixel-camera snapping.
-- [x] Add headless tests for the reusable ATB gauge lifecycle.\n- [ ] Expand tests for remaining runtime systems.
+- [x] Add headless tests for the reusable ATB gauge lifecycle.
+- [ ] Expand tests for remaining runtime systems.
 - [x] Add a reproducible automated screenshot capture for visual behavior (GitHub Actions/Xvfb); retain manual checks on physical displays.
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
