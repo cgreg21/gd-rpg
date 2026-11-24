@@ -47,6 +47,10 @@ jobs:
           for image in artifacts/screenshots/*.png; do
             test "$(stat -c%s "$image")" -gt 10000 || { echo "Screenshot is unexpectedly small: $image"; exit 1; }
           done
+          for scene in demo pixel-test; do
+            difference="$(compare -metric AE "artifacts/screenshots/$scene.png" "artifacts/screenshots/${scene}_crt.png" null: 2>&1 || true)"
+            test "$difference" -gt 0 || { echo "CRT screenshot is identical to clean screenshot for $scene"; exit 1; }
+          done
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
