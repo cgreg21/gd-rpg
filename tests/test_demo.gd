@@ -146,7 +146,7 @@ func _initialize() -> void:
 	assert(demo._save_game(), "Demo progress must save")
 	var village_save := FileAccess.open("user://saves/slot_01.sav", FileAccess.READ)
 	assert(village_save.get_32() == 0x47525047, "Demo save must use the binary signature")
-	assert(village_save.get_32() == 3, "Demo save must use the binary format version")
+	assert(village_save.get_32() == 4, "Demo save must use the binary format version")
 	var village_data: Variant = village_save.get_var(false)
 	village_save.close()
 	assert(village_data.scene == "res://examples/demo/demo.tscn", "Village save must include its scene path")

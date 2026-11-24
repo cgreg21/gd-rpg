@@ -9,8 +9,6 @@ const CRYSTAL_POSITION := Vector2(520, 270)
 const CHEST_POSITION := Vector2(570, 235)
 const DOOR_POSITION := Vector2(570, 175)
 const ROUTE_PORTAL_POSITION := Vector2(82, 278)
-const SAVE_PATH := "user://valbrume_save.json"
-const SAVE_VERSION := 1
 
 var player: RPGCharacter
 var hero_animation: AnimatedSprite2D

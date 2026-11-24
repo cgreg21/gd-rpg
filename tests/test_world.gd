@@ -45,7 +45,7 @@ func _run() -> void:
 	var save_file := FileAccess.open("user://saves/slot_01.sav", FileAccess.READ)
 	assert(save_file != null, "Map save must create the save file")
 	assert(save_file.get_32() == 0x47525047, "Binary save must start with the GD RPG signature")
-	assert(save_file.get_32() == 3, "Binary save must include its format version")
+	assert(save_file.get_32() == 4, "Binary save must include its format version")
 	var save_data: Variant = save_file.get_var(false)
 	save_file.close()
 	assert(save_data.map == "valbrume_route" and save_data.position == [123.0, 234.0], "Map save must record the active map and exact position")
