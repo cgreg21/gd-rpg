@@ -12,6 +12,7 @@ func _ready() -> void:
 	var shader_material := ShaderMaterial.new()
 	shader_material.shader = load("res://addons/gd_rpg/runtime/display/crt.gdshader")
 	crt_overlay.material = shader_material
+	crt_overlay.enabled = OS.get_environment("GD_RPG_SCREENSHOT_CRT") == "1"
 	add_child(crt_overlay)
 	var ui := CanvasLayer.new()
 	add_child(ui)
