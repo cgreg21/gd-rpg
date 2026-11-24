@@ -70,7 +70,7 @@ void fragment() {
 	vec3 crt_image = image * mix(vec3(1.0), grille * scanline * vignette, crt_enabled * strength);
 
 	// Slightly smoked, graphite-colored CRT housing with molded bevels.
-	float top_light = smoothstep(1.0, 0.0, outer_uv.y);
+	float top_light = 1.0 - smoothstep(0.0, 1.0, outer_uv.y);
 	float side_shade = smoothstep(0.0, 0.8, min(outer_uv.x, 1.0 - outer_uv.x));
 	vec3 bezel = mix(vec3(0.018, 0.022, 0.028), vec3(0.105, 0.112, 0.12), top_light * 0.55 + 0.12);
 	bezel += vec3(0.025, 0.028, 0.032) * side_shade;
