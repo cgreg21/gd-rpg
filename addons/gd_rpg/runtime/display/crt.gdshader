@@ -59,6 +59,7 @@ void fragment() {
 	vec3 crt_color = image * grille * scanline * vignette;
 
 	float mask = inside * rounded_corner;
-	vec3 final_color = mix(texture(screen_texture, SCREEN_UV).rgb, crt_color, strength * mask);
+	vec3 clean_image = texture(screen_texture, SCREEN_UV).rgb;
+	vec3 final_color = mix(clean_image, crt_color * mask, strength);
 	COLOR = vec4(final_color, 1.0);
 }
