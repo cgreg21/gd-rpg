@@ -111,6 +111,15 @@ func _initialize() -> void:
 
 	# Transfers retain the party and quest state when the village is recreated.
 	demo.call("_store_transfer_state")
+	var returned_demo := scene.instantiate()
+	root.add_child(returned_demo)
+	await process_frame
+	assert(returned_demo.get("player_hp") == 4 and returned_demo.get("player_mp") == 1, "Recreated village must restore HP and MP")
+	assert(returned_demo.get("gold") == 45 and returned_demo.get("experience") == 20, "Recreated village must restore rewards")
+	assert(returned_demo.get("door_opened") and returned_demo.get("slime_defeated"), "Recreated village must restore quest progression")
+	assert(returned_demo.get("inventory").count(&"potion") == 0, "Recreated village must restore inventory")
+	returned_demo.queue_free()
+	await process_frame
 	demo.set("player_hp", 2)
 	demo.set("player_mp", 0)
 	demo.set("experience", 0)
