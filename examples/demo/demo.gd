@@ -81,11 +81,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if player == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo and not battle_active:
-		if event.keycode == KEY_F5:
-			_save_game()
+		if event.keycode in [KEY_F5, KEY_F6, KEY_F7]:
+			_save_game(event.keycode - KEY_F4)
 			return
-		if event.keycode == KEY_F9:
-			_load_game()
+		if event.keycode in [KEY_F9, KEY_F10, KEY_F11]:
+			_load_game(event.keycode - KEY_F8)
 			return
 	if inventory_open:
 		if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_I, KEY_ESCAPE]:
@@ -468,20 +468,20 @@ func _restore_transfer_state() -> void:
 	_update_inventory_menu()
 	status_label.text = _objective_text()
 
-func _save_game() -> bool:
+func _save_game(slot: int = 1) -> bool:
 	if battle_active or inventory_open:
 		_show_message("Sauvegarde indisponible pendant un menu ou un combat.")
 		return false
 	_store_transfer_state()
-	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/demo.tscn", player.position)
-	_show_message("Partie sauvegardée." if saved else "Impossible d'écrire la sauvegarde.")
+	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/demo.tscn", player.position, slot)
+	_show_message("Emplacement %d sauvegardé." % slot if saved else "Échec de sauvegarde.")
 	return saved
 
-func _load_game() -> bool:
+func _load_game(slot: int = 1) -> bool:
 	if battle_active or inventory_open:
 		_show_message("Chargement indisponible pendant un menu ou un combat.")
 		return false
-	if not RPGMapRouter.load_game(map_id):
+	if not RPGMapRouter.load_game(map_id, slot):
 		_show_message("Sauvegarde absente ou invalide.")
 		return false
 	var saved_position := RPGMapRouter.take_loaded_position(map_id)
@@ -489,7 +489,7 @@ func _load_game() -> bool:
 		player.position = saved_position
 	_restore_transfer_state()
 	player.set_input_enabled(true)
-	_show_message("Partie chargée.")
+	_show_message("Emplacement %d chargé." % slot)
 	return true
 
 func _talk_to_npc() -> void:

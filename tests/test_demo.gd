@@ -144,13 +144,14 @@ func _initialize() -> void:
 	# Save and restore the complete Valbrume quest state.
 	var saved_position: Vector2 = demo.get("player").position
 	assert(demo._save_game(), "Demo progress must save")
-	var village_save := FileAccess.open("user://valbrume_save.sav", FileAccess.READ)
+	var village_save := FileAccess.open("user://saves/slot_01.sav", FileAccess.READ)
 	assert(village_save.get_32() == 0x47525047, "Demo save must use the binary signature")
 	assert(village_save.get_32() == 3, "Demo save must use the binary format version")
 	var village_data: Variant = village_save.get_var(false)
 	village_save.close()
 	assert(village_data.scene == "res://examples/demo/demo.tscn", "Village save must include its scene path")
 	assert(village_data.transfer.door_opened and village_data.transfer.slime_defeated, "Save must include transferable quest state")
+	assert(village_data.slot == 1 and village_data.saved_at > 0, "Save must include slot and timestamp metadata")
 	demo._collect_crystal()
 	demo.set("gold", 0)
 	demo.set("experience", 0)
@@ -169,7 +170,9 @@ func _initialize() -> void:
 	assert(not demo.get("has_crystal") and demo.get("chest_opened") and demo.get("door_opened") and demo.get("slime_defeated"), "Loading must restore quest flags")
 	assert(is_instance_valid(demo.get("crystal")) and not demo.get("crystal").is_queued_for_deletion(), "Loading an earlier save must restore collected world objects")
 	assert(demo.get("inventory").count(&"potion") == 0 and demo.get("inventory").count(&"old_key") == 0, "Loading must restore inventory quantities")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://valbrume_save.json"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://saves/slot_01.sav"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://saves/slot_02.sav"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://saves"))
 
 	test_finished = true
 	print("Demo tests passed: three connected maps, animated hero, quest, locked door, treasure, inventory and battle commands.")

@@ -2,15 +2,17 @@ extends CanvasLayer
 ## Replaces the active RPGMap inside RPGDisplayRoot with a short fade.
 
 const FADE_DURATION := 0.25
-const SAVE_PATH := "user://valbrume_save.sav"
+const SAVE_DIRECTORY := "user://saves"
 const SAVE_MAGIC := 0x47525047
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
+const SAVE_SLOT_COUNT := 3
 const MAP_SCENES := {
 	"valbrume": "res://examples/demo/demo.tscn",
 	"valbrume_route": "res://examples/demo/route.tscn",
 	"valbrume_sanctuary": "res://examples/demo/sanctuary.tscn"
 }
 
+var play_time_seconds := 0.0
 var pending_spawn_id: StringName
 var transfer_data: Dictionary = {}
 var pending_load: Dictionary = {}
@@ -39,16 +41,27 @@ func set_transfer_data(data: Dictionary) -> void:
 func get_transfer_data() -> Dictionary:
 	return transfer_data.duplicate(true)
 
-func save_game(map_id: StringName, scene_path: String, position: Vector2) -> bool:
+func _process(delta: float) -> void:
+	play_time_seconds += delta
+
+func save_game(map_id: StringName, scene_path: String, position: Vector2, slot: int = 1) -> bool:
+	if slot < 1 or slot > SAVE_SLOT_COUNT:
+		return false
 	if not MAP_SCENES.has(String(map_id)) or MAP_SCENES[String(map_id)] != scene_path:
 		return false
+	var directory_error := DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(SAVE_DIRECTORY))
+	if directory_error != OK and directory_error != ERR_ALREADY_EXISTS:
+		return false
 	var data := {
+		"slot": slot,
+		"saved_at": int(Time.get_unix_time_from_system()),
+		"play_time": play_time_seconds,
 		"map": String(map_id),
 		"scene": scene_path,
 		"position": [position.x, position.y],
 		"transfer": transfer_data.duplicate(true)
 	}
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_save_path(slot), FileAccess.WRITE)
 	if file == null:
 		return false
 	file.store_32(SAVE_MAGIC)
@@ -58,21 +71,10 @@ func save_game(map_id: StringName, scene_path: String, position: Vector2) -> boo
 	file.close()
 	return save_error == OK
 
-func load_game(current_map_id: StringName) -> bool:
-	if not FileAccess.file_exists(SAVE_PATH):
+func load_game(current_map_id: StringName, slot: int = 1) -> bool:
+	var data := _read_save(slot)
+	if data.is_empty():
 		return false
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if file == null:
-		return false
-	if file.get_32() != SAVE_MAGIC or file.get_32() != SAVE_VERSION:
-		file.close()
-		return false
-	var parsed: Variant = file.get_var(false)
-	var read_error := file.get_error()
-	file.close()
-	if read_error != OK or not parsed is Dictionary:
-		return false
-	var data: Dictionary = parsed
 	var saved_map := String(data.get("map", ""))
 	var scene_path := String(data.get("scene", ""))
 	var position: Variant = data.get("position")
@@ -87,10 +89,48 @@ func load_game(current_map_id: StringName) -> bool:
 	if not _is_valid_transfer(saved_transfer):
 		return false
 	transfer_data = saved_transfer.duplicate(true)
+	play_time_seconds = maxf(0.0, float(data.get("play_time", 0.0)))
 	pending_load = {"map": saved_map, "position": Vector2(float(position[0]), float(position[1]))}
 	if saved_map != String(current_map_id):
 		transition_to(scene_path, &"default")
 	return true
+
+func get_save_metadata(slot: int) -> Dictionary:
+	var data := _read_save(slot)
+	if data.is_empty():
+		return {}
+	return {
+		"slot": slot,
+		"map": data.map,
+		"saved_at": int(data.saved_at),
+		"play_time": float(data.play_time)
+	}
+
+func _read_save(slot: int) -> Dictionary:
+	if slot < 1 or slot > SAVE_SLOT_COUNT:
+		return {}
+	var path := _save_path(slot)
+	if not FileAccess.file_exists(path):
+		return {}
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return {}
+	if file.get_32() != SAVE_MAGIC or file.get_32() != SAVE_VERSION:
+		file.close()
+		return {}
+	var parsed: Variant = file.get_var(false)
+	var read_error := file.get_error()
+	file.close()
+	if read_error != OK or not parsed is Dictionary:
+		return {}
+	if parsed.get("slot") != slot or not parsed.get("saved_at") is int:
+		return {}
+	if not (parsed.get("play_time") is int or parsed.get("play_time") is float):
+		return {}
+	return parsed
+
+func _save_path(slot: int) -> String:
+	return "%s/slot_%02d.sav" % [SAVE_DIRECTORY, slot]
 
 func _is_valid_transfer(data: Dictionary) -> bool:
 	if data.is_empty():

@@ -22,11 +22,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if player == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F5:
-			_store_map_save()
+		if event.keycode in [KEY_F5, KEY_F6, KEY_F7]:
+			_store_map_save(event.keycode - KEY_F4)
 			return
-		if event.keycode == KEY_F9:
-			_load_map_save()
+		if event.keycode in [KEY_F9, KEY_F10, KEY_F11]:
+			_load_map_save(event.keycode - KEY_F8)
 			return
 	if not event.is_action_pressed("interact"):
 		return
@@ -34,18 +34,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		player.set_input_enabled(false)
 		RPGMapRouter.transition_to("res://examples/demo/demo.tscn", &"village_return")
 
-func _store_map_save() -> void:
-	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/route.tscn", player.position)
-	prompt.text = "Partie sauvegardée" if saved else "Échec de la sauvegarde"
+func _store_map_save(slot: int = 1) -> void:
+	var saved := RPGMapRouter.save_game(map_id, "res://examples/demo/route.tscn", player.position, slot)
+	prompt.text = "Emplacement %d sauvegardé" % slot if saved else "Échec de sauvegarde"
 
-func _load_map_save() -> void:
-	if not RPGMapRouter.load_game(map_id):
+func _load_map_save(slot: int = 1) -> void:
+	if not RPGMapRouter.load_game(map_id, slot):
 		prompt.text = "Sauvegarde absente ou invalide"
 		return
 	var saved_position := RPGMapRouter.take_loaded_position(map_id)
 	if saved_position != Vector2.INF:
 		player.position = saved_position
-	prompt.text = "Partie chargée"
+	prompt.text = "Emplacement %d chargé" % slot
 
 func _process(_delta: float) -> void:
 	if player == null:
