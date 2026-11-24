@@ -21,6 +21,8 @@ var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
 var player_mp := 3
+var experience := 0
+var gold := 0
 var potion_count := 1
 var slime_hp := 3
 var battle_active := false
@@ -235,7 +237,9 @@ func _build_hud() -> void:
 func _talk_to_npc() -> void:
 	var dialogue := RPGDialogue.new()
 	dialogue.dialogue_id = &"lila"
-	if has_crystal:
+	if slime_defeated:
+		dialogue.lines = ["Tu as vaincu le slime ! Le vieux chemin est de nouveau sûr.", "Prends ces quelques pièces et repose-toi. Valbrume te doit une fière chandelle."]
+	elif has_crystal:
 		dialogue.lines = ["Tu as trouvé le cristal ! Il réagit à la présence du slime.", "Le petit monstre bloque le vieux chemin. Tu peux le vaincre avec E."]
 	else:
 		dialogue.lines = ["Bonjour, voyageur. Je suis Lila, gardienne de Valbrume.", "Un cristal bleu est tombé près du vieux pont. Peux-tu le retrouver ?", "Un slime rôde aussi sur le chemin. Méfie-toi !"]
@@ -313,9 +317,15 @@ func _end_battle(victory: bool) -> void:
 	player.set_input_enabled(true)
 	_draw_battle_overlay(false)
 	if victory:
-		slime_defeated = true
-		slime.queue_free()
-		_show_message("Victoire ! Le slime disparaît dans une lueur. Valbrume est sauvée.")
+		if not slime_defeated:
+			slime_defeated = true
+			experience += 20
+			gold += 15
+			slime.queue_free()
+			_show_message("Victoire ! +20 EXP, +15 G. Le chemin est libéré !")
+		else:
+			_show_message("Le slime a déjà été vaincu.")
+		_update_battle_hud()
 		status_label.text = _objective_text()
 	else:
 		player_hp = 1
@@ -324,7 +334,7 @@ func _end_battle(victory: bool) -> void:
 		slime_hp = 3
 
 func _update_battle_hud() -> void:
-	hp_label.text = "PV %d/5  •  PM %d/3" % [player_hp, player_mp]
+	hp_label.text = "PV %d/5  •  PM %d/3  •  EXP %d  •  %d G" % [player_hp, player_mp, experience, gold]
 
 func _update_battle_overlay() -> void:
 	if battle_label == null or not is_instance_valid(battle_label):
