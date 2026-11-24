@@ -37,11 +37,12 @@ The final display pass is a borderless full-screen CRT effect. F3 toggles curvat
 The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
 
 - **Move:** arrow keys
-- **Interact / collect / attack:** E
+- **Interact / collect:** E
+- **Battle commands:** 1 Attack, 2 Azure Spark, 3 Potion, 4 Defend (E/Enter also attacks)
 - **Advance dialogue:** Enter
 - **Toggle CRT:** F3
 
-Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path.
+Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path. The encounter demonstrates a small command menu, MP-consuming skill, healing potion, defensive stance and enemy counterattacks.
 
 ## World and camera foundations
 
