@@ -19,5 +19,7 @@ jobs:
           include-templates: false
       - name: Validate project
         run: godot --headless --editor --path . --quit
+      - name: Run world unit tests
+        run: godot --headless --path . --script res://tests/test_world.gd
       - name: Run project smoke test
         run: godot --headless --path . --quit-after 5
