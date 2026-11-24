@@ -32,7 +32,7 @@ func _initialize() -> void:
 	assert(route.has_spawn_point(&"village_gate"), "Route must expose its village entry spawn")
 	assert(route.has_spawn_point(&"default"), "Route must expose a default spawn")
 	assert(route.get("return_portal") != null, "Route must provide a portal back to the village")
-	root.get_node("RPGMapRouter").set_transfer_data({"gold": 15})
+	root.get_node("RPGMapRouter").set_transfer_data({"hp": 4, "mp": 1, "experience": 12, "gold": 15, "inventory": {"potion": 2}, "has_crystal": true, "chest_opened": false, "door_opened": false, "slime_defeated": false})
 	assert(root.get_node("RPGMapRouter").save_game(&"valbrume_route", "res://examples/demo/route.tscn", Vector2(222, 144)), "Forest route must be saveable")
 	route.get("player").position = Vector2.ZERO
 	route.call("_load_map_save")
