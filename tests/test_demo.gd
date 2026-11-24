@@ -31,7 +31,7 @@ func _initialize() -> void:
 	assert(demo.get("chest_opened"), "Chest must open")
 	assert(demo.get("gold") == 10, "Chest must award ten gold")
 	assert(demo.get("inventory").count(&"old_key") == 1, "Chest must add one quest key")
-	assert(not is_instance_valid(demo.get("chest")), "Opened chest must be removed")
+	assert(demo.get("chest").is_queued_for_deletion(), "Opened chest must be removed")
 	demo._open_chest()
 	assert(demo.get("gold") == 10 and demo.get("inventory").count(&"old_key") == 1, "Chest rewards must only be granted once")
 	demo._toggle_inventory()

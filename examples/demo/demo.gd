@@ -371,13 +371,13 @@ func _battle_action(action: String) -> void:
 
 func _use_potion() -> bool:
 	var potion := inventory.get_item(&"potion")
-	if potion == null or not inventory.remove_item(&"potion"):
+	if potion == null or inventory.count(&"potion") == 0:
 		_show_message("Tu n'as plus de potion.")
 		return false
 	if player_hp == 5:
-		inventory.add_item(&"potion")
 		_show_message("Tes PV sont déjà au maximum.")
 		return false
+	inventory.remove_item(&"potion")
 	player_hp = mini(5, player_hp + potion.hp_restore)
 	defending = false
 	_update_battle_hud()
