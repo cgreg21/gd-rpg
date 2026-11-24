@@ -1,6 +1,6 @@
 class_name RPGATBBattle
 extends Node
-## Lightweight ATB clock. Battle presentation and command resolution remain separate.
+## Lightweight ATB clock. Battlers can define an "atb_speed" metadata value.
 
 signal gauge_ready(battler: Node)
 signal battle_started
@@ -29,9 +29,7 @@ func _process(delta: float) -> void:
 		if not is_instance_valid(battler):
 			continue
 		var key := battler.get_instance_id()
-		var speed := 1.0
-		if battler is RPGActorData:
-			speed = battler.speed
+		var speed := maxf(0.1, float(battler.get_meta("atb_speed", 1.0)))
 		var value: float = _gauges.get(key, 0.0) + delta * charge_rate * speed
 		if value >= gauge_max:
 			value = 0.0

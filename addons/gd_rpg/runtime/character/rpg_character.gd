@@ -6,10 +6,10 @@ extends CharacterBody2D
 @export var input_enabled: bool = true
 
 func _physics_process(_delta: float) -> void:
-	if not input_enabled:
-		velocity = Vector2.ZERO
+	if input_enabled:
+		velocity = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") * move_speed
 	else:
-		velocity = Input.get_vector("move_left", "move_right", "move_up", "move_down") * move_speed
+		velocity = Vector2.ZERO
 	move_and_slide()
 
 func set_input_enabled(enabled: bool) -> void:
