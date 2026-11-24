@@ -96,7 +96,7 @@ func _initialize() -> void:
 	demo.set("slime_defeated", false)
 	demo.get("player").position = Vector2.ZERO
 	demo.get("inventory").add_item(&"potion", 1)
-	var loaded := demo._load_game()
+	var loaded: bool = demo._load_game()
 	assert(loaded, "A valid save must load: %s" % demo.get("dialogue_label").text)
 	if not loaded:
 		quit(1)
