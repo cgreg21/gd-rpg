@@ -26,18 +26,18 @@ The initial CRT shader adds scanlines, a subtle vertical grille and vignette. It
 
 - Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).
 - Use `get_spawn_position(&"spawn_name")` to resolve a named entry point; unknown names fall back to the map's `default_spawn`.
-- Use `RPGPixelCamera` as a `Camera2D` child of the player. It rounds the camera's world position to whole virtual pixels to avoid subpixel camera movement.
+- Use `RPGPixelCamera` as a `Camera2D` child of the player. It offsets the camera view to whole virtual pixels without mutating the camera's world transform, avoiding subpixel camera movement.
 - The demo is itself an `RPGMap`, uses a named default spawn, and demonstrates the pixel camera.
 
 The map base and camera are foundations: TileMapLayer composition, camera limits and map transitions are still planned.
 
 ## Layout
-- `addons/gd_rpg/runtime`: reusable runtime systems, including display effects
+- `addons/gd_rpg/runtime`: reusable runtime systems, including display, character, dialogue, interaction and world foundations
 - `addons/gd_rpg/data`: typed Resource definitions
 - `addons/gd_rpg/ui`: reusable UI
 - `addons/gd_rpg/editor`: editor integration
 - `examples/demo`: playable systems showcase
 - `examples/pixel_test`: pixel-grid and CRT test scene
-- `tests`: automated smoke checks
+- `tests`: automated headless checks
 
 See [ROADMAP.md](ROADMAP.md) for the implementation plan and remaining work.
