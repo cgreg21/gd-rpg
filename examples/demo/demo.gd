@@ -7,6 +7,7 @@ const NPC_POSITION := Vector2(430, 150)
 const SLIME_POSITION := Vector2(190, 145)
 const CRYSTAL_POSITION := Vector2(520, 270)
 const CHEST_POSITION := Vector2(570, 235)
+const DOOR_POSITION := Vector2(570, 175)
 
 var player: RPGCharacter
 var hero_animation: AnimatedSprite2D
@@ -20,6 +21,8 @@ var slime: Node2D
 var crystal: Node2D
 var chest: Node2D
 var chest_opened := false
+var door: Node2D
+var door_opened := false
 var has_crystal := false
 var slime_defeated := false
 var player_hp := 5
@@ -92,6 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var distance_crystal := player.global_position.distance_to(CRYSTAL_POSITION)
 	var distance_slime := player.global_position.distance_to(SLIME_POSITION)
 	var distance_chest := player.global_position.distance_to(CHEST_POSITION)
+	var distance_door := player.global_position.distance_to(DOOR_POSITION)
 	if distance_npc < 42.0:
 		_talk_to_npc()
 	elif distance_crystal < 30.0 and not has_crystal:
@@ -100,6 +104,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_battle()
 	elif distance_chest < 38.0 and not chest_opened:
 		_open_chest()
+	elif distance_door < 40.0 and not door_opened:
+		_open_door()
 	else:
 		_show_message("Il n'y a rien à faire ici.")
 
@@ -205,6 +211,12 @@ func _build_characters() -> void:
 	add_child(chest)
 	_draw_chest(chest)
 	_add_name_tag(chest, "Coffre")
+
+	door = Node2D.new()
+	door.position = DOOR_POSITION
+	add_child(door)
+	_draw_locked_door(door)
+	_add_name_tag(door, "Sanctuaire")
 
 func _build_inventory() -> void:
 	inventory = RPGInventory.new()
@@ -396,6 +408,21 @@ func _open_chest() -> void:
 	_update_inventory_menu()
 	_show_message("Coffre ouvert ! +10 G et une vieille clé.")
 
+func _open_door() -> void:
+	if door_opened:
+		return
+	if inventory.count(&"old_key") == 0:
+		_show_message("La porte est verrouillée. Il faut une clé.")
+		return
+	inventory.remove_item(&"old_key")
+	door_opened = true
+	gold += 20
+	door.queue_free()
+	_update_battle_hud()
+	_update_inventory_menu()
+	status_label.text = _objective_text()
+	_show_message("Le sanctuaire s'ouvre ! +20 G.")
+
 func _enemy_turn() -> void:
 	if not battle_active:
 		return
@@ -479,6 +506,8 @@ func _objective_text() -> String:
 		return "Objectif : retrouver le cristal azur près du pont"
 	if not slime_defeated:
 		return "Objectif : vaincre le slime sur le chemin"
+	if not door_opened:
+		return "Objectif : ouvrir le sanctuaire avec la vieille clé"
 	return "Quête terminée : Valbrume est en paix !"
 
 func _show_message(message: String) -> void:
@@ -571,6 +600,19 @@ func _draw_chest(parent: Node2D) -> void:
 	lock.size = Vector2(4, 7)
 	lock.color = Color("#e7c879")
 	parent.add_child(lock)
+
+func _draw_locked_door(parent: Node2D) -> void:
+	_draw_rect(Vector2(-18, -22), Vector2(36, 44), "#65432f", 0)
+	_draw_rect(Vector2(-14, -18), Vector2(28, 40), "#a66c3d", 1)
+	_draw_rect(Vector2(-3, -2), Vector2(6, 10), "#e7c879", 2)
+	var blocker := StaticBody2D.new()
+	var collision := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(36, 12)
+	collision.shape = shape
+	collision.position = Vector2(0, 15)
+	blocker.add_child(collision)
+	parent.add_child(blocker)
 
 func _draw_slime(parent: Node2D) -> void:
 	var blob := Polygon2D.new()

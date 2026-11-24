@@ -117,6 +117,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 - [x] Add an exploration inventory menu showing item descriptions and quantities.
 - [ ] Add shop stock, buying and selling.
 - [x] Add a one-time treasure chest to Valbrume with gold and a quest key reward.
+- [x] Add a locked sanctuary door that consumes the key and grants a one-time reward.
 
 ### P2.3 — Save and load
 - [ ] Define a versioned save-data format.
@@ -129,7 +130,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ## P3 — Battle system
 
-**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. Defeating the slime now grants 20 EXP and 15 G, updates the HUD, and unlocks Lila's closing dialogue; tests ensure the reward is granted only once. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. The demo's Potion and Old Key are defined by `RPGItemData` and stored in `RPGInventory`; the exploration menu (I) lists owned items and pauses movement while open. A one-time chest grants 10 G and the key. The potion-use flow and input handling were simplified during the KISS refactor. The inventory enforces stack limits and has dedicated unit tests. Connecting ATB to the demo command flow and adding party/target data remain planned.
+**Progress:** Valbrume demonstrates a four-command encounter: Attack, Azure Spark (MP cost), Potion and Defend. Enemy counterattacks, HP/MP updates, item consumption, victory and defeat recovery are covered by headless demo tests. Defeating the slime now grants 20 EXP and 15 G, updates the HUD, and unlocks Lila's closing dialogue; tests ensure the reward is granted only once. The reusable `RPGATBBattle` manager now charges individual battler gauges, supports `atb_speed`, emits readiness/progress signals, holds full gauges until a command is consumed, and supports participant removal and battle cleanup. Its lifecycle has dedicated headless tests. The demo's Potion and Old Key are defined by `RPGItemData` and stored in `RPGInventory`; the exploration menu (I) lists owned items and pauses movement while open. A one-time chest grants 10 G and the key; the key opens the sanctuary door for a further 20 G and is consumed. The demo tests cover missing-key rejection and one-time rewards. The potion-use flow and input handling were simplified during the KISS refactor. The inventory enforces stack limits and has dedicated unit tests. Connecting ATB to the demo command flow and adding party/target data remain planned.
 
 ### P3.1 — Battle loop
 - [~] Turn the ATB timer foundation into a complete battle state machine (reusable gauge lifecycle is implemented; command orchestration remains).

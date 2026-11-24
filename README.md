@@ -49,9 +49,9 @@ The final display pass is a borderless full-screen CRT effect. F3 toggles curvat
 
 ## Playable demo — Valbrume
 
-The reusable inventory uses `RPGItemData` Resources and an `RPGInventory` node for stack limits, quantities, additions and removals. Valbrume starts with one Potion (3 PV); command 3 consumes it from the inventory. A nearby treasure chest grants 10 G and a unique Old Key, both displayed in the inventory menu. Chest rewards cannot be collected twice; headless tests cover stacking limits, item listing and the one-time reward.
+The reusable inventory uses `RPGItemData` Resources and an `RPGInventory` node for stack limits, quantities, additions and removals. Valbrume starts with one Potion (3 PV); command 3 consumes it from the inventory. A nearby treasure chest grants 10 G and a unique Old Key. The key unlocks the sanctuary door, consumes itself and grants 20 G; both rewards are one-time only. headless tests cover stacking limits, item listing and the one-time reward.
 
-The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
+Unlock the sanctuary after opening the chest to complete the extended village objective. The demo is a compact JRPG slice with a 16/32-bit fantasy direction: a cliffside village, warm stone paths, timber house, river, lush greenery, a named NPC, a collectible crystal and a slime encounter. The original hero has front/back/left/right walk animations.
 
 - **Move:** arrow keys
 - **Inventory:** I (close with I or Échap)\n- **Treasure chest:** E near the chest
