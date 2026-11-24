@@ -1,0 +1,21 @@
+name: Godot CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y godot
+      - name: Validate project
+        run: godot --headless --editor --path . --quit
+      - name: Run project smoke test
+        run: godot --headless --path . --quit-after 5
