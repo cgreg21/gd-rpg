@@ -37,7 +37,7 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 
 ### CRT shader and display options
 - [x] Add an optional full-screen CRT canvas shader that samples the rendered framebuffer in one final presentation pass.
-- [x] Implement configurable scanlines and an RGB phosphor grille mask.
+- [x] Implement configurable, clearly visible scanlines at native output resolution with a three-pixel cadence, plus an RGB phosphor grille mask.
 - [x] Add barrel/screen curvature, rounded screen corners and vignette controls.
 - [x] Add restrained phosphor glow and chromatic aberration controls.
 - [x] Expose shader parameters directly on `RPGCRTOverlay` for inspector/runtime tuning.
