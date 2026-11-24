@@ -11,13 +11,19 @@ capture_scene() {
   local pid
 
   if [[ -n "$scene" ]]; then
-    "$GODOT" --path . --resolution 1920x1080 --windowed "$scene" &
+    "$GODOT" --path . --resolution 1920x1080 --windowed "$scene" > "$OUTPUT_DIR/$name.log" 2>&1 &
   else
-    "$GODOT" --path . --resolution 1920x1080 --windowed &
+    "$GODOT" --path . --resolution 1920x1080 --windowed > "$OUTPUT_DIR/$name.log" 2>&1 &
   fi
   pid=$!
 
   sleep 4
+  if grep -E "SCRIPT ERROR:|ERROR: Failed to load script" "$OUTPUT_DIR/$name.log"; then
+    echo "Godot reported a script loading error for $name." >&2
+    kill "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+    return 1
+  fi
   import -window root "$OUTPUT_DIR/$name.png"
   xdotool key --clearmodifiers F3
   sleep 1
