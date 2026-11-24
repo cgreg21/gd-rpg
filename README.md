@@ -20,6 +20,15 @@ The project renders at a virtual resolution of **320×180** and opens in a **192
 
 GitHub Actions captures the demo and pixel-test scenes at 1920×1080, both with CRT disabled and enabled. Download the `gd-rpg-1080p-screenshots` artifact from the **Visual screenshots** workflow run. The captures are generated in a virtual X display; they validate the rendered output at the target resolution, but are not a substitute for checking on physical displays.\n\nThe initial CRT shader adds scanlines, a subtle vertical grille and vignette. It is an overlay, not a full framebuffer distortion pass; curvature, bloom and chromatic aberration are not implemented yet.
 
+## World and camera foundations
+
+- Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).
+- Use `get_spawn_position(&"spawn_name")` to resolve a named entry point; unknown names fall back to the map's `default_spawn`.
+- Use `RPGPixelCamera` as a `Camera2D` child of the player. It rounds the camera's world position to whole virtual pixels to avoid subpixel camera movement.
+- The demo is itself an `RPGMap`, uses a named default spawn, and demonstrates the pixel camera.
+
+The map base and camera are foundations: TileMapLayer composition, camera limits and map transitions are still planned.
+
 ## Layout
 - `addons/gd_rpg/runtime`: reusable runtime systems, including display effects
 - `addons/gd_rpg/data`: typed Resource definitions
