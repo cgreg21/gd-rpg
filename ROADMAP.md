@@ -65,19 +65,20 @@ The target is the feel and systems of classic 16-bit JRPGs: readable top-down ex
 ## P1 — Exploration and world
 
 ### P1.0 — Pixel-perfect rendering foundation
-- [ ] Implement the virtual resolution and integer viewport scaling rules above.
-- [ ] Configure nearest-neighbor filtering as the default for pixel-art content.
+- [x] Implement the virtual resolution and integer viewport scaling rules above.
+- [x] Configure nearest-neighbor filtering as the default for pixel-art content.
 - [x] Add a reusable pixel-aligned camera setup that rounds camera world coordinates to whole virtual pixels (scrolling-map verification remains).
 - [x] Add a pixel-grid test scene with a moving marker, tile grid and UI to reveal filtering issues.
 - [x] Add an optional CRT overlay shader with clean and CRT modes (scanlines, grille and vignette).
 - [x] Expose runtime CRT enable/disable and effect strength through the overlay script; F3 toggles it in the demo.
 - [~] Document the initial pixel-art settings; camera alignment, shader tuning and broader import guidance remain.
 
-**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` rounds camera coordinates to whole virtual pixels and is used by the demo. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay remains toggleable at runtime. Scrolling-map camera verification, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
+**Progress:** the project now runs at 320×180 with integer viewport scaling and nearest-neighbor filtering. `RPGPixelCamera` offsets the camera view to whole virtual pixels without mutating its world transform, and is used by the demo. Headless tests cover camera snapping while its target moves. The demo is also the first `RPGMap`, with a named default spawn. The CRT overlay remains toggleable at runtime. Scrolling-map camera verification, real screen curvature/bloom, and visual checks across multiple physical window sizes remain open. CI screenshot capture validates the target 1080p output but does not replace manual inspection on physical displays.
 
 ### P1.1 — Maps and navigation
 - [ ] Establish a reusable map scene structure using `TileMapLayer`.
-- [ ] Add player spawn markers and named spawn points.
+- [x] Add an `RPGMap` base with named `Marker2D` spawn points and default-spawn fallback.
+- [x] Add a named default spawn marker to the demo map.
 - [ ] Add map-to-map transitions with fade in/out.
 - [ ] Preserve party and world state when changing maps.
 - [ ] Add camera follow, limits and optional room framing.
@@ -209,7 +210,8 @@ Apply these to every feature, not as a late cleanup phase:
 - [ ] Use typed GDScript and clear names.
 - [ ] Keep reusable engine code under `addons/gd_rpg/`; keep demo-specific code under `examples/`.
 - [x] Add headless tests for named map spawn lookup and default fallback.
-- [ ] Add tests for logic that can be tested without rendering.
+- [x] Add headless tests for map spawn fallback and pixel-camera snapping.
+- [ ] Expand tests for remaining runtime systems.
 - [x] Add a reproducible automated screenshot capture for visual behavior (GitHub Actions/Xvfb); retain manual checks on physical displays.
 - [ ] Update the README or relevant docs when public behavior changes.
 - [ ] Preserve pixel alignment and nearest-neighbor sampling in all new visual features.
