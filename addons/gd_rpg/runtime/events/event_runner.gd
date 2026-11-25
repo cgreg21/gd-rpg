@@ -7,7 +7,6 @@ signal switch_changed(name: StringName, value: bool)
 signal completed
 signal cancelled
 signal step_released
-signal _move_finished
 
 var is_running := false
 var _run_id := 0
@@ -28,14 +27,12 @@ func _process(delta: float) -> void:
 		return
 	if not is_instance_valid(_moving_character):
 		_moving_character = null
-		_move_finished.emit()
 		return
 	_move_elapsed += delta
 	var weight := minf(_move_elapsed / _move_duration, 1.0)
 	_moving_character.global_position = _move_start.lerp(_move_target, weight)
 	if weight >= 1.0:
 		_moving_character = null
-		_move_finished.emit()
 
 func start(event: RPGEvent, character: Node2D = null, map_router: Node = null) -> bool:
 	if is_running or event == null or not event.is_valid():
@@ -57,7 +54,6 @@ func stop() -> void:
 	_run_id += 1
 	is_running = false
 	_moving_character = null
-	_move_finished.emit()
 	step_released.emit()
 	cancelled.emit()
 	_character = null
@@ -120,8 +116,12 @@ func _move_character(command: RPGEventCommand, run_id: int) -> bool:
 	_move_target = command.target_position
 	_move_duration = command.duration
 	_move_elapsed = 0.0
-	await _move_finished
-	return _is_current(run_id)
+	await get_tree().create_timer(command.duration).timeout
+	if not _is_current(run_id) or not is_instance_valid(_character):
+		return false
+	_character.global_position = command.target_position
+	_moving_character = null
+	return true
 
 func _is_current(run_id: int) -> bool:
 	return is_running and run_id == _run_id
