@@ -1,7 +1,12 @@
 extends SceneTree
 
 func _initialize() -> void:
+	create_timer(15.0).timeout.connect(_on_timeout)
 	call_deferred("_run")
+
+func _on_timeout() -> void:
+	push_error("Event tests timed out.")
+	quit(1)
 
 func _make_command(type: RPGEventCommand.Type) -> RPGEventCommand:
 	var command := RPGEventCommand.new()
@@ -29,6 +34,7 @@ func _run() -> void:
 		completed_count += 1
 	)
 
+	print("Event test: message sequence")
 	assert(runner.start(event), "A valid event must start")
 	assert(not runner.start(event), "A running event must not start twice")
 	await process_frame
@@ -40,6 +46,7 @@ func _run() -> void:
 	assert(runner.get_switch(&"gate_open"), "Switch command must run after message advance")
 	assert(finished and not runner.is_running, "Event must emit completed at the end")
 
+	print("Event test: movement")
 	var character := Node2D.new()
 	root.add_child(character)
 	var move_event := RPGEvent.new()
@@ -54,6 +61,7 @@ func _run() -> void:
 	assert(character.global_position.is_equal_approx(Vector2(20, 10)), "Move command must reach its target")
 	assert(finished, "Move event must complete")
 
+	print("Event test: cancellation")
 	var wait_event := RPGEvent.new()
 	wait_event.event_id = &"cancel_wait"
 	var wait := _make_command(RPGEventCommand.Type.WAIT)
@@ -75,6 +83,7 @@ func _run() -> void:
 	assert(not runner.start(invalid_event), "Invalid events must not start")
 	assert(not runner.start(null), "Null events must not start")
 
+	print("Event test: restart after cancellation")
 	var later_event := RPGEvent.new()
 	later_event.event_id = &"later_wait"
 	var later_wait := _make_command(RPGEventCommand.Type.WAIT)
