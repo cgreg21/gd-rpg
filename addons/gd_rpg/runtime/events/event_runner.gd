@@ -6,9 +6,9 @@ signal message_requested(text: String)
 signal switch_changed(name: StringName, value: bool)
 signal completed
 signal cancelled
-signal step_released
 
 var is_running := false
+var _waiting_for_message := false
 var _run_id := 0
 var _switches: Dictionary = {}
 var _character: Node2D
@@ -46,7 +46,7 @@ func start(event: RPGEvent, character: Node2D = null, map_router: Node = null) -
 
 func advance() -> void:
 	if is_running:
-		step_released.emit()
+		_waiting_for_message = false
 
 func stop() -> void:
 	if not is_running:
@@ -54,7 +54,7 @@ func stop() -> void:
 	_run_id += 1
 	is_running = false
 	_moving_character = null
-	step_released.emit()
+	_waiting_for_message = false
 	cancelled.emit()
 	_character = null
 	_map_router = null
@@ -90,8 +90,10 @@ func _run_event(event: RPGEvent, run_id: int) -> void:
 func _execute_command(command: RPGEventCommand, run_id: int) -> bool:
 	match command.type:
 		RPGEventCommand.Type.SHOW_MESSAGE:
+			_waiting_for_message = true
 			message_requested.emit(command.message)
-			await step_released
+			while _waiting_for_message and _is_current(run_id):
+				await get_tree().process_frame
 			return _is_current(run_id)
 		RPGEventCommand.Type.WAIT:
 			await get_tree().create_timer(command.duration).timeout
