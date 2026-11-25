@@ -67,6 +67,10 @@ Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime
 
 Create an `RPGEvent` Resource and add ordered `RPGEventCommand` Resources. The first event runner supports messages (wait for `advance()`), timed waits, character movement, boolean switches and map transfers. Commands run sequentially; invalid event data is rejected, and `stop()` cancels the active sequence. Connect `message_requested` to your dialogue UI and call `advance()` when the player closes the message. Switches currently live in the runner instance; persistence, variables, branching and automatic trigger zones are planned follow-ups. See `addons/gd_rpg/runtime/events/` and `tests/test_events.gd`.
 
+## Generated post-apocalyptic tileset
+
+The Valbrume sample maps use an original generated 8×8 atlas at `examples/demo/assets/wasteland_tileset.png`. It contains 64 terrain and prop tiles, each 16×16 pixels. `DemoWastelandWorld` builds native Godot `TileSetAtlasSource` and `TileMapLayer` nodes, then fills the village, forest route and sanctuary with deterministic terrain variants and map-specific debris. The village atlas supplies cracked asphalt paths and polluted water, the route uses an asphalt trail, and the sanctuary uses industrial concrete. All tile layers use nearest-neighbor filtering inside the existing 640×360 world viewport.
+
 ## World and camera foundations
 
 - Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).

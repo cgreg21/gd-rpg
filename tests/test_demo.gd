@@ -13,6 +13,11 @@ func _initialize() -> void:
 	root.add_child(demo)
 	await process_frame
 
+	var village_ground := demo.get_node_or_null("WastelandGround") as TileMapLayer
+	assert(village_ground != null, "Village must use the generated TileMapLayer")
+	assert(village_ground.tile_set.tile_size == Vector2i(16, 16), "Generated atlas must use 16px tiles")
+	assert(village_ground.get_used_cells().size() == 40 * 23, "Village ground must cover the full map")
+	assert(demo.get_node_or_null("WastelandProps") is TileMapLayer, "Village must use generated props")
 	assert(demo.get("player") is RPGCharacter, "Demo must create a controllable RPGCharacter")
 	assert(demo.get("hero_animation") is AnimatedSprite2D, "Hero must use an animated pixel-art sprite")
 	assert(demo.get("npc") != null, "Demo must create its quest NPC")
@@ -28,6 +33,9 @@ func _initialize() -> void:
 	var route := route_scene.instantiate()
 	root.add_child(route)
 	await process_frame
+	var route_ground := route.get_node_or_null("WastelandGround") as TileMapLayer
+	assert(route_ground != null and route_ground.get_used_cells().size() == 40 * 23, "Route must use generated terrain")
+	assert(route.get_node_or_null("WastelandProps") is TileMapLayer, "Route must use generated props")
 	assert(route is RPGMap and route.map_id == &"valbrume_route", "Route must be a reusable RPGMap")
 	assert(route.has_spawn_point(&"village_gate"), "Route must expose its village entry spawn")
 	assert(route.has_spawn_point(&"default"), "Route must expose a default spawn")
@@ -85,6 +93,8 @@ func _initialize() -> void:
 	var sanctuary := sanctuary_scene.instantiate()
 	root.add_child(sanctuary)
 	await process_frame
+	var sanctuary_ground := sanctuary.get_node_or_null("WastelandGround") as TileMapLayer
+	assert(sanctuary_ground != null and sanctuary_ground.get_used_cells().size() == 40 * 23, "Sanctuary must use generated terrain")
 	assert(sanctuary is RPGMap and sanctuary.map_id == &"valbrume_sanctuary", "Sanctuary must be a reusable RPGMap")
 	assert(sanctuary.has_spawn_point(&"village_entry"), "Sanctuary must expose its village entry spawn")
 	assert(sanctuary.get("player") is RPGCharacter, "Sanctuary must create the player")

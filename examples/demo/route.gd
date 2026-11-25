@@ -66,21 +66,7 @@ func _build_world() -> void:
 		marker.position = spawn_data[1]
 		points.add_child(marker)
 
-	var ground := ColorRect.new()
-	ground.size = Vector2(640, 360)
-	ground.color = Color("#315d43")
-	ground.z_index = -10
-	add_child(ground)
-	for x in range(0, 640, 32):
-		for y in range(0, 360, 32):
-			var tile := ColorRect.new()
-			tile.position = Vector2(x + 1, y + 1)
-			tile.size = Vector2(30, 30)
-			tile.color = Color("#3d704b") if (x / 32 + y / 32) % 2 == 0 else Color("#376647")
-			tile.z_index = -9
-			add_child(tile)
-
-	_draw_rect(Vector2(0, 145), Vector2(640, 70), "#987c55", -5)
+	DemoWastelandWorld.build(self, &"route")
 	for tree_position in [Vector2(170, 95), Vector2(250, 275), Vector2(365, 85), Vector2(455, 275), Vector2(585, 90)]:
 		_draw_tree(tree_position)
 	return_portal = Node2D.new()

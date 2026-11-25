@@ -59,9 +59,9 @@ func _build_world() -> void:
 		marker.name = spawn_data[0]
 		marker.position = spawn_data[1]
 		points.add_child(marker)
-	_draw_rect(Vector2.ZERO, Vector2(640, 360), "#252b42", -10)
-	_draw_rect(Vector2(32, 24), Vector2(576, 312), "#77654e", -5)
-	_draw_rect(Vector2(48, 40), Vector2(544, 280), "#b9a27a", -4)
+	DemoWastelandWorld.build(self, &"sanctuary")
+	_draw_rect(Vector2(32, 24), Vector2(16, 312), "#594936", -3)
+	_draw_rect(Vector2(592, 24), Vector2(16, 312), "#594936", -3)
 	_draw_rect(Vector2(48, 40), Vector2(544, 12), "#594936", -3)
 	_draw_rect(Vector2(48, 308), Vector2(544, 12), "#594936", -3)
 	for x in range(80, 600, 64):

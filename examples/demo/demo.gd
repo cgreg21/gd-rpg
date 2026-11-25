@@ -1,6 +1,5 @@
 extends RPGMap
 
-const WORLD_SIZE := Vector2(640, 360)
 const HERO_SHEET: Texture2D = preload("res://examples/demo/assets/hero.svg")
 const PLAYER_START := Vector2(300, 210)
 const NPC_POSITION := Vector2(430, 150)
@@ -173,28 +172,8 @@ func _build_world() -> void:
 	sanctuary_spawn.position = Vector2(570, 215)
 	spawn_points.add_child(sanctuary_spawn)
 
-	var ground := ColorRect.new()
-	ground.size = WORLD_SIZE
-	ground.color = Color("#477b45")
-	ground.z_index = -20
-	add_child(ground)
-	for x in range(0, 640, 32):
-		for y in range(0, 360, 32):
-			var tile := ColorRect.new()
-			tile.position = Vector2(x + 1, y + 1)
-			tile.size = Vector2(30, 30)
-			tile.color = Color("#548b4c") if (x / 32 + y / 32) % 2 == 0 else Color("#4d8246")
-			tile.z_index = -19
-			add_child(tile)
-
-	# A winding stone path through a small cliffside village.
-	_draw_rect(Vector2(0, 250), Vector2(640, 46), "#a88a61", -5)
-	_draw_rect(Vector2(255, 120), Vector2(72, 160), "#a88a61", -5)
-	_draw_rect(Vector2(300, 120), Vector2(210, 44), "#a88a61", -5)
-	_draw_rect(Vector2(0, 70), Vector2(145, 66), "#286f9a", -4)
-	_draw_rect(Vector2(0, 130), Vector2(38, 230), "#286f9a", -4)
-	_draw_rect(Vector2(8, 75), Vector2(125, 5), "#59a9c5", -3)
-	_draw_rect(Vector2(36, 125), Vector2(5, 220), "#59a9c5", -3)
+	DemoWastelandWorld.build(self, &"village")
+	# The atlas supplies the cracked road and polluted water surfaces.
 
 	_build_house(Vector2(350, 55))
 	route_portal = _create_route_portal()
