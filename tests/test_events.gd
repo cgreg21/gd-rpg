@@ -1,5 +1,13 @@
 extends SceneTree
 
+class MockMapRouter extends Node:
+	var requested_scene := ""
+	var requested_spawn: StringName
+
+	func transition_to(scene_path: String, spawn_id: StringName) -> void:
+		requested_scene = scene_path
+		requested_spawn = spawn_id
+
 func _initialize() -> void:
 	create_timer(15.0).timeout.connect(_on_timeout)
 	call_deferred("_run")
@@ -41,7 +49,7 @@ func _run() -> void:
 	assert(messages == ["The gate is open."], "Message command must be emitted first")
 	assert(not runner.get_switch(&"gate_open"), "Later commands must wait for message advance")
 	runner.advance()
-	await runner.completed
+	await process_frame
 	assert(runner.get_switch(&"gate_open"), "Switch command must run after message advance")
 	assert(finished and not runner.is_running, "Event must emit completed at the end")
 
@@ -56,7 +64,7 @@ func _run() -> void:
 	move_event.commands = [move]
 	finished = false
 	assert(runner.start(move_event, character), "Move event must start with a character")
-	await runner.completed
+	await create_timer(0.1).timeout
 	assert(character.global_position.is_equal_approx(Vector2(20, 10)), "Move command must reach its target")
 	assert(finished, "Move event must complete")
 
@@ -89,11 +97,27 @@ func _run() -> void:
 	later_wait.duration = 2.0
 	later_event.commands = [later_wait]
 	assert(runner.start(later_event), "A new event must start after cancellation")
+	await process_frame
 	await create_timer(1.1).timeout
 	assert(runner.is_running, "The cancelled wait must not finish a later event")
 	assert(completed_count == 2, "A cancelled event must not emit completed after a later event starts")
 	runner.stop()
 	assert(not runner.is_running, "The later event must stop cleanly")
+
+	print("Event test: map transfer")
+	var transfer_event := RPGEvent.new()
+	transfer_event.event_id = &"transfer"
+	var transfer := _make_command(RPGEventCommand.Type.TRANSFER_MAP)
+	transfer.scene_path = "res://examples/demo/route.tscn"
+	transfer.spawn_id = &"village_gate"
+	transfer_event.commands = [transfer]
+	var mock_router := MockMapRouter.new()
+	root.add_child(mock_router)
+	assert(runner.start(transfer_event, null, mock_router), "Transfer event must start with a router")
+	await process_frame
+	assert(mock_router.requested_scene == transfer.scene_path, "Transfer command must request its map")
+	assert(mock_router.requested_spawn == &"village_gate", "Transfer command must preserve its spawn")
+	assert(not runner.is_running, "Transfer sequence must complete")
 
 	print("Event command tests passed.")
 	quit()
