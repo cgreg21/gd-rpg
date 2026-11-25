@@ -90,13 +90,16 @@ The target is the feel and systems of classic 16-bit and early 32-bit JRPGs: rea
 **Acceptance:** the player can walk between at least three maps, arrive at the correct spawn point, collide with obstacles, and retain world state.
 
 ### P1.2 — Interactions and event commands
-- [ ] Add a small event command model: show message, wait, move character, change switch, change variable, transfer map.
-- [ ] Add event execution with predictable sequencing and cancellation.
+- [x] Add a small event command model: show message, wait, move character, change switch and transfer map.
+- [x] Add event execution with predictable sequencing and cancellation.
+- [ ] Add change-variable commands.
 - [ ] Add NPC facing and interaction range.
 - [ ] Add trigger zones for automatic events.
-- [ ] Add switches and variables persisted in world state.
+- [ ] Persist switches and variables in world state and save files.
 - [ ] Add simple branching conditions.
-- [ ] Add example quest using NPCs, switches and map transfers.
+- [ ] Integrate the event runner into a complete sample quest using NPCs, switches and map transfers.
+
+**Progress:** `RPGEvent` and `RPGEventCommand` are editable Resources. `RPGEventRunner` executes messages, waits, character movement, boolean switches and map transfers in order. Message commands pause until `advance()`; `stop()` cancels a running sequence. Invalid command data is rejected before execution. Switches currently belong to the runner instance and are not yet persisted. Headless tests cover sequential progression, completion, movement, switch updates, cancellation and invalid input.
 
 **Acceptance:** a complete short quest can be played from start to finish without custom one-off scripts for each event.
 

@@ -63,6 +63,10 @@ Unlock the sanctuary after opening the chest to enter its new interior map; the 
 
 Talk to Lila, collect the azurite crystal near the bridge, then defeat the slime on the path. The encounter demonstrates a small command menu, MP-consuming skill, healing potion, defensive stance and enemy counterattacks. Defeating the slime awards 20 EXP and 15 G, and unlocks Lila's closing dialogue. The reusable `RPGATBBattle` node is available at `addons/gd_rpg/runtime/battle/atb_battle.gd`: it manages per-battler charge rates, ready states and explicit turn consumption. See its headless coverage in `tests/test_atb.gd`.
 
+## Reusable events
+
+Create an `RPGEvent` Resource and add ordered `RPGEventCommand` Resources. The first event runner supports messages (wait for `advance()`), timed waits, character movement, boolean switches and map transfers. Commands run sequentially; invalid event data is rejected, and `stop()` cancels the active sequence. Connect `message_requested` to your dialogue UI and call `advance()` when the player closes the message. Switches currently live in the runner instance; persistence, variables, branching and automatic trigger zones are planned follow-ups. See `addons/gd_rpg/runtime/events/` and `tests/test_events.gd`.
+
 ## World and camera foundations
 
 - Extend `RPGMap` for reusable map scenes. Add `Marker2D` nodes below a `SpawnPoints` child and name them (the default marker is `default`).

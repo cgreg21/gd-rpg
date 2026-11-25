@@ -25,6 +25,8 @@ jobs:
         run: godot --headless --path . --script res://tests/test_display.gd
       - name: Run playable demo tests
         run: godot --headless --path . --script res://tests/test_demo.gd
+      - name: Run event system tests
+        run: godot --headless --path . --script res://tests/test_events.gd
       - name: Run ATB system tests
         run: godot --headless --path . --script res://tests/test_atb.gd
       - name: Run inventory system tests
