@@ -92,7 +92,17 @@ jobs:
             exit 0
           fi
           git commit -m "build: publish Linux AppImage [skip appimage]"
-          git push
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Could not publish AppImage after 3 attempts"
+              exit 1
+            fi
+          done
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
