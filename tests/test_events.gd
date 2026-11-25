@@ -62,6 +62,7 @@ func _run() -> void:
 	var was_cancelled := false
 	runner.cancelled.connect(func() -> void: was_cancelled = true)
 	assert(runner.start(wait_event), "Wait event must start")
+	await process_frame
 	runner.stop()
 	await process_frame
 	assert(was_cancelled and not runner.is_running, "Stopping an event must cancel it")

@@ -8,6 +8,8 @@ signal completed
 signal cancelled
 signal step_released
 
+const MOVE_TICK := 1.0 / 60.0
+
 var is_running := false
 var _run_id := 0
 var _switches: Dictionary = {}
@@ -93,10 +95,10 @@ func _move_character(command: RPGEventCommand, run_id: int) -> bool:
 	var start_position := _character.global_position
 	var elapsed := 0.0
 	while elapsed < command.duration:
-		await get_tree().process_frame
+		await get_tree().create_timer(MOVE_TICK).timeout
 		if not _is_current(run_id) or not is_instance_valid(_character):
 			return false
-		elapsed += get_process_delta_time()
+		elapsed += MOVE_TICK
 		var weight := minf(elapsed / command.duration, 1.0)
 		_character.global_position = start_position.lerp(command.target_position, weight)
 	return _is_current(run_id)
