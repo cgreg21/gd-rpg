@@ -9,6 +9,7 @@ signal cancelled
 signal step_released
 
 var is_running := false
+var _run_id := 0
 var _switches: Dictionary = {}
 var _character: Node2D
 var _map_router: Node
@@ -16,10 +17,11 @@ var _map_router: Node
 func start(event: RPGEvent, character: Node2D = null, map_router: Node = null) -> bool:
 	if is_running or event == null or not event.is_valid():
 		return false
+	_run_id += 1
 	is_running = true
 	_character = character
 	_map_router = map_router
-	_run_event.call_deferred(event)
+	_run_event.call_deferred(event, _run_id)
 	return true
 
 func advance() -> void:
@@ -29,6 +31,7 @@ func advance() -> void:
 func stop() -> void:
 	if not is_running:
 		return
+	_run_id += 1
 	is_running = false
 	step_released.emit()
 	cancelled.emit()
@@ -44,54 +47,59 @@ func set_switch(name: StringName, value: bool) -> void:
 	_switches[name] = value
 	switch_changed.emit(name, value)
 
-func _run_event(event: RPGEvent) -> void:
+func _run_event(event: RPGEvent, run_id: int) -> void:
 	for command in event.commands:
-		if not is_running:
+		if not _is_current(run_id):
 			return
-		var succeeded: bool = await _execute_command(command)
+		var succeeded: bool = await _execute_command(command, run_id)
 		if not succeeded:
-			if is_running:
+			if _is_current(run_id):
 				is_running = false
 				cancelled.emit()
-			_character = null
-			_map_router = null
+				_character = null
+				_map_router = null
 			return
+	if not _is_current(run_id):
+		return
 	is_running = false
 	_character = null
 	_map_router = null
 	completed.emit()
 
-func _execute_command(command: RPGEventCommand) -> bool:
+func _execute_command(command: RPGEventCommand, run_id: int) -> bool:
 	match command.type:
 		RPGEventCommand.Type.SHOW_MESSAGE:
 			message_requested.emit(command.message)
 			await step_released
-			return is_running
+			return _is_current(run_id)
 		RPGEventCommand.Type.WAIT:
 			await get_tree().create_timer(command.duration).timeout
-			return is_running
+			return _is_current(run_id)
 		RPGEventCommand.Type.MOVE_CHARACTER:
-			return await _move_character(command)
+			return await _move_character(command, run_id)
 		RPGEventCommand.Type.SET_SWITCH:
 			set_switch(command.switch_name, command.switch_value)
-			return is_running
+			return _is_current(run_id)
 		RPGEventCommand.Type.TRANSFER_MAP:
-			if _map_router == null or not is_instance_valid(_map_router):
+			if not _is_current(run_id) or _map_router == null or not is_instance_valid(_map_router):
 				return false
 			_map_router.call("transition_to", command.scene_path, command.spawn_id)
-			return is_running
+			return _is_current(run_id)
 	return false
 
-func _move_character(command: RPGEventCommand) -> bool:
-	if _character == null or not is_instance_valid(_character):
+func _move_character(command: RPGEventCommand, run_id: int) -> bool:
+	if not _is_current(run_id) or _character == null or not is_instance_valid(_character):
 		return false
 	var start_position := _character.global_position
 	var elapsed := 0.0
 	while elapsed < command.duration:
 		await get_tree().process_frame
-		if not is_running or not is_instance_valid(_character):
+		if not _is_current(run_id) or not is_instance_valid(_character):
 			return false
 		elapsed += get_process_delta_time()
 		var weight := minf(elapsed / command.duration, 1.0)
 		_character.global_position = start_position.lerp(command.target_position, weight)
-	return is_running
+	return _is_current(run_id)
+
+func _is_current(run_id: int) -> bool:
+	return is_running and run_id == _run_id

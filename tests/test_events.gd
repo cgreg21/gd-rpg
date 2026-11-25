@@ -22,8 +22,12 @@ func _run() -> void:
 	event.commands = [message, switch]
 	var messages: Array[String] = []
 	var finished := false
+	var completed_count := 0
 	runner.message_requested.connect(func(value: String) -> void: messages.append(value))
-	runner.completed.connect(func() -> void: finished = true)
+	runner.completed.connect(func() -> void:
+		finished = true
+		completed_count += 1
+	)
 
 	assert(runner.start(event), "A valid event must start")
 	assert(not runner.start(event), "A running event must not start twice")
@@ -70,12 +74,17 @@ func _run() -> void:
 	assert(not runner.start(invalid_event), "Invalid events must not start")
 	assert(not runner.start(null), "Null events must not start")
 
-	var missing_character_event := RPGEvent.new()
-	missing_character_event.event_id = &"missing_character"
-	missing_character_event.commands = [move]
-	assert(runner.start(missing_character_event), "Event runner accepts valid command data")
-	await process_frame
-	assert(not runner.is_running, "Move command without a character must stop the sequence")
+	var later_event := RPGEvent.new()
+	later_event.event_id = &"later_wait"
+	var later_wait := _make_command(RPGEventCommand.Type.WAIT)
+	later_wait.duration = 2.0
+	later_event.commands = [later_wait]
+	assert(runner.start(later_event), "A new event must start after cancellation")
+	await create_timer(1.1).timeout
+	assert(runner.is_running, "The cancelled wait must not finish a later event")
+	assert(completed_count == 2, "A cancelled event must not emit completed after a later event starts")
+	runner.stop()
+	assert(not runner.is_running, "The later event must stop cleanly")
 
 	print("Event command tests passed.")
 	quit()
