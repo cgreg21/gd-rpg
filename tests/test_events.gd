@@ -41,8 +41,7 @@ func _run() -> void:
 	assert(messages == ["The gate is open."], "Message command must be emitted first")
 	assert(not runner.get_switch(&"gate_open"), "Later commands must wait for message advance")
 	runner.advance()
-	await process_frame
-	await process_frame
+	await runner.completed
 	assert(runner.get_switch(&"gate_open"), "Switch command must run after message advance")
 	assert(finished and not runner.is_running, "Event must emit completed at the end")
 
@@ -57,7 +56,7 @@ func _run() -> void:
 	move_event.commands = [move]
 	finished = false
 	assert(runner.start(move_event, character), "Move event must start with a character")
-	await create_timer(0.1).timeout
+	await runner.completed
 	assert(character.global_position.is_equal_approx(Vector2(20, 10)), "Move command must reach its target")
 	assert(finished, "Move event must complete")
 
