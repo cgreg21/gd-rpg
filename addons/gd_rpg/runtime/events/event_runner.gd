@@ -7,14 +7,35 @@ signal switch_changed(name: StringName, value: bool)
 signal completed
 signal cancelled
 signal step_released
-
-const MOVE_TICK := 1.0 / 60.0
+signal _move_finished
 
 var is_running := false
 var _run_id := 0
 var _switches: Dictionary = {}
 var _character: Node2D
 var _map_router: Node
+var _moving_character: Node2D
+var _move_start := Vector2.ZERO
+var _move_target := Vector2.ZERO
+var _move_duration := 0.0
+var _move_elapsed := 0.0
+
+func _ready() -> void:
+	set_process(true)
+
+func _process(delta: float) -> void:
+	if _moving_character == null:
+		return
+	if not is_instance_valid(_moving_character):
+		_moving_character = null
+		_move_finished.emit()
+		return
+	_move_elapsed += delta
+	var weight := minf(_move_elapsed / _move_duration, 1.0)
+	_moving_character.global_position = _move_start.lerp(_move_target, weight)
+	if weight >= 1.0:
+		_moving_character = null
+		_move_finished.emit()
 
 func start(event: RPGEvent, character: Node2D = null, map_router: Node = null) -> bool:
 	if is_running or event == null or not event.is_valid():
@@ -35,6 +56,8 @@ func stop() -> void:
 		return
 	_run_id += 1
 	is_running = false
+	_moving_character = null
+	_move_finished.emit()
 	step_released.emit()
 	cancelled.emit()
 	_character = null
@@ -92,15 +115,12 @@ func _execute_command(command: RPGEventCommand, run_id: int) -> bool:
 func _move_character(command: RPGEventCommand, run_id: int) -> bool:
 	if not _is_current(run_id) or _character == null or not is_instance_valid(_character):
 		return false
-	var start_position := _character.global_position
-	var elapsed := 0.0
-	while elapsed < command.duration:
-		await get_tree().create_timer(MOVE_TICK).timeout
-		if not _is_current(run_id) or not is_instance_valid(_character):
-			return false
-		elapsed += MOVE_TICK
-		var weight := minf(elapsed / command.duration, 1.0)
-		_character.global_position = start_position.lerp(command.target_position, weight)
+	_moving_character = _character
+	_move_start = _character.global_position
+	_move_target = command.target_position
+	_move_duration = command.duration
+	_move_elapsed = 0.0
+	await _move_finished
 	return _is_current(run_id)
 
 func _is_current(run_id: int) -> bool:
